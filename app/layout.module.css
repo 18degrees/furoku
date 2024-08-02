@@ -1,0 +1,4 @@
+.main {
+    margin: auto;
+    min-height: calc(100vh - 60px)
+}

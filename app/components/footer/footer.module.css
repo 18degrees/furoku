@@ -1,0 +1,38 @@
+.footer {
+    background-color: #7B6178;
+    padding: 50px 0 50px 0;
+}
+.footer > div {
+    width: 60%;
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.footer h2 {
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+.info p {
+    color: #ffffff;
+    user-select: all;
+    font-size: 20px;
+}
+.info p::selection {
+    background-color: #4b4b4b;
+}
+.footer a {
+    text-align: center;
+}
+@media screen and (max-width: 1000px) {
+    .footer > div {
+        flex-direction: column-reverse;
+    }
+    .info {
+        margin-top: 30px;
+    }
+    .info h2 {
+        display: none;
+    }
+}

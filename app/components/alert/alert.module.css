@@ -1,0 +1,8 @@
+.alert {
+    width: 100%;
+    text-align: center;
+    padding: 15px;
+    margin-bottom: 10px;
+    color: #2D262D;
+    font-size: 18px;
+}

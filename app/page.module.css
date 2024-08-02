@@ -1,0 +1,97 @@
+.container > div {
+    width: 60%;
+    max-width: 1200px;
+    margin: 40px auto;
+    user-select: text;
+    background-color: #f1e4f3;
+    padding: 40px 5%;
+}
+.header-block {
+    margin: 100px auto;
+    width: 100%;
+    display: flex;
+    width: fit-content
+}
+.header-block > span {
+    font-size: 120px;
+    color: #b8a2b4;
+    writing-mode: tb-rl;
+    letter-spacing: 30px;
+    display: block;
+    margin-right: 20px;
+}
+.header-block h1 {
+    color: #7c6778;
+    font-size: 50px;
+    max-width: 300px;
+    z-index: 10;
+}
+.container h2 {
+    font-size: 30px;
+    color: #8a778e;
+}
+.container h3 {
+    font-size: 23px;
+}
+.text-content {
+    margin: auto;
+    max-width: 800px;
+    font-size: 21px;
+    color: #5c525e
+}
+.text-block {
+    margin-bottom: 50px;
+}
+.text-block p {
+    margin-bottom: 15px;
+}
+.text-block i {
+    display: block;
+    margin: 10px 0 0 10px;
+}
+.text-block ol {
+    margin-top: 5px;
+}
+.text-block ol li {
+    margin-bottom: 3px;
+}
+
+@media screen and (max-width: 1300px) {
+    .container > div {
+        width: 90%;
+    }
+}
+@media screen and (max-width: 850px) {
+    .header-block span {
+        font-size: 100px
+    }
+    .header-block h1 {
+        font-size: 40px
+    }
+    .text-content {
+        font-size: 18px
+    }
+    .container h2 {
+        font-size: 25px;
+    }
+    .container h3 {
+        font-size: 20px;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .header-block {
+        margin-top: 30px;
+    }
+    .header-block h1 {
+        text-align: center;
+    }
+    .header-block > span {
+        position: absolute;
+        margin: auto;
+        left: 0;
+        right: 0;
+        width: fit-content;
+        color: #e9dbe7;
+    }
+}

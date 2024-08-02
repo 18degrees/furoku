@@ -1,0 +1,84 @@
+.container {
+    min-height: calc(100vh - 156px);
+}
+.content {
+    box-shadow: 0px 2px 4px rgba(100,100,100,0.5);
+    margin: 5vh auto 0;
+    width: fit-content;
+    padding: 40px 180px;
+    position: relative;
+    background-color: #EFE0EC;
+}
+.spinner {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+}
+.h1 {
+    margin: 0 auto 20px auto;
+    width: fit-content;
+    text-align: center;
+    color: #a691a7;
+}
+.interactive {
+    width: 400px;
+    margin: auto;
+}
+.signup {
+    float: right;
+    margin: 8px 8px 0 0;
+    color: rgb(71 71 71);
+    font-size: 17px;
+}
+.inputs-box {
+    padding-top: 40px;
+}
+.credentials {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto 40px;
+    width: 100%
+}
+.inputs-box label {
+    color: #656565;
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+.inputs-box input {
+    font-size: 18px;
+    padding: 10px 15px;
+    background-color: #F8F3F7;
+    color: #454046;
+    border: 1px solid transparent;
+}
+.inputs-box input::placeholder {
+    color:#9b9b9b
+}
+.container button {
+    display: block;
+    margin: auto;
+    background-color: #8F7592;
+    color: white;
+    padding: 15px;
+    font-size: 18px;
+    border-radius: 5px;
+    width: 250px;
+}
+.container button:disabled {
+    background-color: #9E8AA1;
+}
+
+@media screen and (max-width: 760px) {
+    .content {
+        width: 100%;
+        border: none;
+        box-shadow: none;
+        min-height: calc(100vh - 60px);
+        margin: 0;
+        padding: 40px 0;
+    }
+    .interactive {
+        width: 90%;
+        max-width: 500px
+    }
+}

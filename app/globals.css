@@ -1,0 +1,48 @@
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+::selection {
+  background-color: rgb(234 217 236);
+}
+select::-ms-expand {
+  display: none;
+}
+html, body {
+  overflow-x: hidden;
+}
+html {
+  background-color: #EDDCEC;
+  min-width: 320px;
+  user-select: none;
+}
+a {
+  color: unset;
+  cursor: pointer;
+}
+button {
+  cursor: pointer;
+  background-color: transparent;
+  padding: 0;
+}
+button:disabled {
+  cursor: default;
+}
+select {
+  outline: none;
+  padding: 5px;
+  border: none;
+}
+label, input, select, button {
+  outline: none;
+  border: none
+}
+h1, h2, h3 {
+  font-weight: 400;
+}
+h1 {
+  font-size: 35px;
+}
+strong {
+  font-weight: 500;
+}

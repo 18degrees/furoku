@@ -1,0 +1,151 @@
+.header {
+    height: 60px;
+    background-color: #7B6178;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    font-size: 18px;
+}
+.header a {
+    text-decoration: none;
+}
+.site-name {
+    font-size: 30px;
+    color: #ffffff;
+    margin-left: 7%;
+}
+.nav-background {
+    z-index: 1;
+    opacity: .3;
+    background-color: #393939;
+    display: none;
+}
+.nav {
+    z-index: 100;
+    transition: transform .5s;
+}
+.nav .close {
+    display: none;
+    margin: 15px 0 0 7%;
+    cursor: pointer;
+}
+.nav ul {
+    list-style-type: none;
+    padding: 0;
+}
+.nav li {
+    display: inline;
+}
+.nav li:first-of-type, .nav li:nth-child(2) {
+    margin-right: 70px;    
+}
+.nav a {
+    color: #ffffff;
+}
+.user-box {
+    margin-right: 7%;
+    height: 60px;
+    text-align: center;
+    line-height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.user-box:hover .menu-container {
+    display: block;
+}
+.user {
+    display: block;
+    width: 40px;
+    height: 40px;
+    background-color: #EDDCEC;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 40px;
+    font-size: 25px;
+    color: rgb(108, 89, 110);
+}
+.menu-container {
+    display: none;
+    position: absolute;
+    top: 60px;
+    padding-top: 10px;
+}
+.menu {
+    padding: 20px;
+    background-color: #7B6178;
+    position: relative;
+    text-align: start;
+    line-height: normal;
+    z-index: 100;
+    color: #ffffff;
+    border-radius: 10px;
+}
+.menu span {
+    cursor: pointer;
+}
+.exit-block {
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.pages-icon {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin-left: 7%;
+    height: 60px;
+    align-items: center;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 700px) {
+    .site-name {
+        margin: auto;
+    }
+    .user-box {
+        position: absolute;
+        right: 0;
+    }
+    .menu-container {
+        right: -15px
+    }
+    .pages-icon {
+        display: flex;
+    }
+    .nav-background {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        transform: translateX(-100vw);
+    }
+    .nav {
+        display: block;
+        background-color: #7B6178;
+        transform: translateX(-100%);
+        position: fixed;
+        left: 0;
+        top: 0;
+        right: 0;
+        padding-bottom: 20px;
+    }
+    .nav .close {
+        display: block;
+    }
+    .nav ul {
+        padding-left: 15px;
+        height: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+    }
+    .nav li {
+        display: block;
+        width: 100%;
+        padding: 10px 30px;
+    }
+}
