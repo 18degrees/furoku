@@ -1,6 +1,6 @@
 <h1>furoku</h1>
 
-![typeScript](https://img.shields.io/badge/typescript-007ACC?style=for-the-badge&logo=typescript&logoColor=white&link=https%3A%2F%2Fwww.typescriptlang.org%2F) ![next](https://img.shields.io/badge/next-black?style=for-the-badge&logo=nextdotjs&labelColor=black&link=https%3A%2F%2Fnextjs.org%2F) ![couchDB](https://img.shields.io/badge/couchdb-black?style=for-the-badge&logo=apachecouchdb&logoColor=E32428&labelColor=black&link=https%3A%2F%2Fcouchdb.apache.org%2F/)
+![typeScript](https://img.shields.io/badge/typescript-007ACC?style=for-the-badge&logo=typescript&logoColor=white&link=https%3A%2F%2Fwww.typescriptlang.org%2F) ![next](https://img.shields.io/badge/next-505050?style=for-the-badge&logo=nextdotjs&labelColor=505050&link=https%3A%2F%2Fnextjs.org%2F) ![couchDB](https://img.shields.io/badge/couchdb-505050?style=for-the-badge&logo=apachecouchdb&logoColor=E32428&labelColor=505050&link=https%3A%2F%2Fcouchdb.apache.org%2F/)
 
 
 ## Функция сайта
