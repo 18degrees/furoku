@@ -5,7 +5,7 @@ import { EMAIL_PATTERN, PASSWORD_LENGTH } from "../patterns/auth"
 import { Spinner } from "../components/spinner/Spinner"
 import { useState, useEffect, useContext } from "react"
 import { signIn, useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { redirect, useRouter, useSearchParams } from "next/navigation"
 import style from './page.module.css'
 import { alegreya } from "../fonts"
 import Link from "next/link"
@@ -19,13 +19,6 @@ export default function SignIn() {
     const [isResponseLoading, setIsResponseLoading] = useState(false)
 
     const alerts = useContext(AlertsContext)
-
-    const {data: session} = useSession()
-
-    useEffect(() => {
-        session ? router.replace('/repeat') : null
-
-    }, [router, session])
 
     useEffect(() => {
         checkCredentials()
@@ -56,6 +49,8 @@ export default function SignIn() {
             if (response && !response.ok) return alerts.pushAlert({message: 'Данные неверны', status: 'error'})
 
             alerts.pushAlert({message: 'Авторизация выполнена', status: 'success'})
+
+            router.replace('/repeat')
                 
         } catch (error) {
             alerts.pushAlert({message: 'Ошибка сервера. Попробуйте позже', status: 'error'})
