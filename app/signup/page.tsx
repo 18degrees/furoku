@@ -91,7 +91,6 @@ export default function Signup() {
 
             setIsResponseLoading(false)
             
-            router.replace('/profile')
         } catch (error) {
             setIsResponseLoading(false)
 
