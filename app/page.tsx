@@ -1,8 +1,11 @@
 import style from './page.module.css'
 import { alegreya, shippori_mincho } from './fonts'
 import Link from 'next/link'
+import { getServerSession } from 'next-auth'
 
-export default function Page() {
+export default async function Page() {
+    const session = await getServerSession()
+
     return (
         <div className={style.container}>
             <div>
@@ -28,7 +31,7 @@ export default function Page() {
                         <p>
                             Для начала <Link href='/signup'>зарегистрируйтесь</Link>.
                             Посмотрите в <Link href='/kanji/single'>списке</Link>, что хотите добавить к повторению. 
-                            Чтобы поддерживать актуальность сортировки по срочности, периодически проходите <Link href='/test'>тестирование</Link>.
+                            Чтобы поддерживать актуальность сортировки по срочности, периодически проходите <Link href={session ? '/test' : '/signin?callbackUrl=/test'}>тестирование</Link>.
                             Результаты ищите на <Link href='/repeat'>странице повторения</Link>.
                         </p>
                     </div>

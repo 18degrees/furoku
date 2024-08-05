@@ -58,7 +58,7 @@ export function Header() {
                             </li>
                             <li>
                                 <Link 
-                                    href='/test'
+                                    href={session ? '/test' : '/signin?callbackUrl=/test'}
                                     onClick={() => setIsNavOpened(false)}
                                     >Тестирование
                                 </Link>

@@ -2,10 +2,10 @@
 
 import { AlertsContext } from "../components/providers/Alerts/AlertsProvider"
 import { EMAIL_PATTERN, PASSWORD_LENGTH } from "../patterns/auth"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Spinner } from "../components/spinner/Spinner"
 import { useState, useEffect, useContext } from "react"
 import { signIn, useSession } from "next-auth/react"
-import { redirect, useRouter, useSearchParams } from "next/navigation"
 import style from './page.module.css'
 import { alegreya } from "../fonts"
 import Link from "next/link"
@@ -17,8 +17,18 @@ export default function SignIn() {
     const router = useRouter()
 
     const [isResponseLoading, setIsResponseLoading] = useState(false)
-
+    
     const alerts = useContext(AlertsContext)
+
+    const searchParams = useSearchParams()
+    const {data: session} = useSession()
+    const callbackUrl = searchParams.get('callbackUrl') ?? '/repeat'
+
+    useEffect(() => {
+        if (session) {
+            router.replace(callbackUrl)
+        }
+    }, [router, session, searchParams])
 
     useEffect(() => {
         checkCredentials()
@@ -48,10 +58,7 @@ export default function SignIn() {
             
             if (response && !response.ok) return alerts.pushAlert({message: 'Данные неверны', status: 'error'})
 
-            alerts.pushAlert({message: 'Авторизация выполнена', status: 'success'})
-
-            router.replace('/repeat')
-                
+            alerts.pushAlert({message: 'Авторизация выполнена', status: 'success'})                
         } catch (error) {
             alerts.pushAlert({message: 'Ошибка сервера. Попробуйте позже', status: 'error'})
         }
