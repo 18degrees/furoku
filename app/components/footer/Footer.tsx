@@ -13,9 +13,9 @@ export function Footer() {
                     <p>support@furoku.ru</p>
                 </div>
                 <Link 
-                    href='https://github.com/18degrees' 
+                    href='https://github.com/18degrees/furoku' 
                     target='_blank'
-                    rel='author'
+                    rel='external'
                     className={style.git}
                 >
                     <Image
