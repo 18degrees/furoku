@@ -32,7 +32,7 @@ export default async function Page() {
                             Для начала <Link href='/signup'>зарегистрируйтесь</Link>.
                             Посмотрите в <Link href='/kanji/single'>списке</Link>, что хотите добавить к повторению. 
                             Чтобы поддерживать актуальность сортировки по срочности, периодически проходите <Link href={session ? '/test' : '/signin?callbackUrl=/test'}>тестирование</Link>.
-                            Результаты ищите на <Link href='/repeat'>странице повторения</Link>.
+                            Результаты ищите на <Link href={session ? '/repeat' : '/signin?callbackUrl=/repeat'}>странице повторения</Link>.
                         </p>
                     </div>
                     <div className={style['text-block']} id='frequency'>
