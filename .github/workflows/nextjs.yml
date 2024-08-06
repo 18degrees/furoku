@@ -26,8 +26,6 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          fingerprint: ${{ secrets.SSH_FINGERPRINT }}
           script: |
             cd /root/furoku
             git pull
