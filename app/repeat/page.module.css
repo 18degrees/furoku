@@ -25,6 +25,7 @@
     text-align: center;
     line-height: 350px;
     background-color: #f1e4f3;
+    box-shadow: 2px 4px rgb(212 192 212 / 50%);
     min-width: 250px;
     max-width: 350px;
     width: 50%;
@@ -34,9 +35,10 @@
 .menu {
     width: 250px;
     padding: 20px 30px;
-    background-color: #cebece;
+    background-color: #e4d4e4;
     font-size: 17px;
     color: #463c45;
+    box-shadow: 2px 4px rgb(181 163 181 / 50%)
 }
 .menu select {
     font-size: 17px;
@@ -44,7 +46,7 @@
     width: 100%;
     margin-top: 5px;
     padding: 10px;
-    background-color: #eee5ef;
+    background-color: #fef0ff;
     border-radius: 5px;
 }
 .menu select:first-of-type {
@@ -54,7 +56,8 @@
     margin-top: 60px;
 }
 .interaction button:disabled {
-    background-color: #e5d9e7;
+    background-color: #f9edfc;
+    box-shadow: unset;
 }
 .interaction > div { 
     display: flex;
@@ -64,7 +67,8 @@
     margin-right: 10px;
 }
 .interaction button {
-    background-color: #eee5ef;
+    box-shadow: 2px 2px rgb(181 166 181 / 50%);
+    background-color: #fef0ff;
     border-radius: 5px;
 }
 .interaction .copy {
