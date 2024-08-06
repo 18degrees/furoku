@@ -7,23 +7,27 @@
     padding: 40px 5%;
 }
 .header-block {
-    margin: 100px auto;
-    width: 100%;
+    margin: 30px auto 60px auto;
     display: flex;
-    width: fit-content
+    align-items: center;
+    max-width: 800px
 }
 .header-block > span {
-    font-size: 120px;
-    color: #b8a2b4;
+    user-select: none;
+    font-size: 70px;
+    color: #F1E4F3;
     writing-mode: tb-rl;
     letter-spacing: 30px;
     display: block;
     margin-right: 20px;
+    padding: 20px 30px 0 30px;
+    line-height: 50px;
+    background-color: #AA94A7;
+    border-radius: 10px;
 }
 .header-block h1 {
     color: #7c6778;
-    font-size: 50px;
-    max-width: 300px;
+    max-width: 200px;
     z-index: 10;
 }
 .container h2 {
@@ -63,10 +67,10 @@
 }
 @media screen and (max-width: 850px) {
     .header-block span {
-        font-size: 100px
+        font-size: 60px
     }
     .header-block h1 {
-        font-size: 40px
+    font-size: 30px;
     }
     .text-content {
         font-size: 18px
@@ -78,20 +82,22 @@
         font-size: 20px;
     }
 }
-
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 500px) {
     .header-block {
-        margin-top: 30px;
+        flex-direction: column;
+        justify-content: center;
+        margin-top: 0;
     }
     .header-block h1 {
         text-align: center;
     }
-    .header-block > span {
-        position: absolute;
-        margin: auto;
-        left: 0;
-        right: 0;
-        width: fit-content;
-        color: #e9dbe7;
+    .header-block span {
+        text-align: center;
+        margin: 0 0 30px 0;
+        font-size: 30px;
+        writing-mode: unset;
+        padding: 0px 30px 5px 45px;
+        line-height: unset;
+        letter-spacing: 15px;
     }
 }
