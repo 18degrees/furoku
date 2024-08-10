@@ -22,9 +22,10 @@ export default function SignIn() {
 
     const searchParams = useSearchParams()
     const {data: session} = useSession()
-    const callbackUrl = searchParams.get('callbackUrl') ?? '/repeat'
-
+    
     useEffect(() => {
+        const callbackUrl = searchParams.get('callbackUrl') ?? '/repeat'
+        
         if (session) {
             router.replace(callbackUrl)
         }
