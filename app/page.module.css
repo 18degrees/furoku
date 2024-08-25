@@ -34,6 +34,10 @@
     font-size: 30px;
     color: #8a778e;
 }
+.container h2 + p > ul {
+    list-style: none;
+    padding-left: 0;
+}
 .container h3 {
     font-size: 23px;
 }
