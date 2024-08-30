@@ -1,4 +1,8 @@
 User-agent: *
-Allow: /$
-Allow: /kanji
-Disallow: /*
+
+Allow: /*
+
+Disallow: /test
+Disallow: /repeat
+Disallow: /signin
+Disallow: /signup
