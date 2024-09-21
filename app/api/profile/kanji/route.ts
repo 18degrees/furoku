@@ -1,5 +1,5 @@
-import { IKanjiWithPointsBrief } from "@/app/interfaces/kanji.interface"
-import { IUserDoc, usersKanji } from "@/app/interfaces/db.interface"
+import { IDBKanji, IKanjiProps, IKanjiWithPointsBrief, knownValue } from "@/app/interfaces/kanji.interface"
+import { IUserDoc, usersKanji } from "@/app/interfaces/user.interface"
 import getUser from "../../auxiliaries/getUser"
 import { NextRequest } from "next/server"
 import nano from "nano"
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
         }, {status: 400})
     
         const nanoServer = nano(DB_URI)
-        const usersDB = nanoServer.db.use('users')
+        const usersDB: nano.DocumentScope<IUserDoc> = nanoServer.db.use('users')
 
         const user = await getUser(usersDB)
 
@@ -121,25 +121,22 @@ interface IOptions {
     },
     descending: any,
 }
-interface ITotalSort {
-    knownValue: 'total'
-}
 
 //Далее интерфейсы с возможными параметрами сортировки в профиле
 interface IKnownWritingSort {
-    knownValue: 'known_writing'
+    knownValue: 'writing'
     pointsOf: 'total' | 'meaning' | 'reading'
 }
 interface IKnownMeaningSort {
-    knownValue: 'known_meaning'
+    knownValue: 'meaning'
     pointsOf: 'total' | 'writing' | 'reading'
 }
 interface IKnownReadingSort {
-    knownValue: 'known_reading'
+    knownValue: 'reading'
     pointsOf: 'total' | 'meaning' | 'writing'
 }
 
-type sortType = IKnownMeaningSort | IKnownReadingSort | IKnownWritingSort | ITotalSort
+type sortType = IKnownMeaningSort | IKnownReadingSort | IKnownWritingSort
 
 //Здесь сортируются по очкам и отправляются повторяемые кандзи
 
@@ -153,7 +150,7 @@ export async function GET(req: NextRequest) {
         const descending = getAcceptableDescending(options?.descending)     //хотя подразумевается возможость изменения порядка, на клиенте она пока не используется: сортировка идёт только от меньшего числа очков к большему
 
         const nanoServer = nano(DB_URI)
-        const usersDB = nanoServer.db.use('users')
+        const usersDB: nano.DocumentScope<IUserDoc> = nanoServer.db.use('users')
 
         const user = await getUser(usersDB)
     
@@ -172,10 +169,12 @@ export async function GET(req: NextRequest) {
         }, {status: 200})                                   //204 статус выдаёт ошибку, поэтому просто не возвращаем массив kanjis
 
         const preparedKanjis = await prepareKanjis(kanjis, {sort, descending})
+
+        const fullInfoKanjis = await getFullInfoKanji(preparedKanjis, sort.knownValue)
         
         return Response.json(
             {
-                kanjis: preparedKanjis
+                kanjis: fullInfoKanjis
             }, 
             {status: 200}
         )
@@ -192,29 +191,80 @@ export async function GET(req: NextRequest) {
         const pointsOf = sortObj.pointsOf
 
         if ( //если и известное значение, и то, от чего сортировать верно
-            (knownValue === 'known_writing' && (pointsOf === 'meaning' || pointsOf === 'reading')) ||
-            (knownValue === 'known_meaning' && (pointsOf === 'writing' || pointsOf === 'reading')) ||
-            (knownValue === 'known_reading' && (pointsOf === 'writing' || pointsOf === 'meaning')) 
+            (knownValue === 'writing' && (pointsOf === 'meaning' || pointsOf === 'reading')) ||
+            (knownValue === 'meaning' && (pointsOf === 'writing' || pointsOf === 'reading')) ||
+            (knownValue === 'reading' && (pointsOf === 'writing' || pointsOf === 'meaning')) 
         ) {
             return {
                 knownValue,
                 pointsOf
             }
         } else {
-            if (knownValue === 'known_writing' || knownValue === 'known_meaning' || knownValue === 'known_reading') { //если верно только известное изачение
+            if (knownValue === 'writing' || knownValue === 'meaning' || knownValue === 'reading') { //если верно только известное изачение
                 return {
                     knownValue,
                     pointsOf: 'total'
                 }
             } else { //если все данные неверны
                 return {
-                    knownValue: 'total'
+                    knownValue: 'writing',
+                    pointsOf: 'total'
                 }
             }
         }
     }
     function getAcceptableDescending(descending: any): boolean {
         return descending === 'true' ? true : false
+    }
+    async function getFullInfoKanji(kanjis: string[], knownValue: knownValue): Promise<IKanjiProps[]> {
+        try {
+            const kanjisFullInfo: IKanjiProps[] = []
+            
+            const nanoServer = nano(DB_URI)
+
+            const kanjiDB: nano.DocumentScope<IDBKanji> = nanoServer.db.use('kanji')
+
+            for (const writing of kanjis) {
+                try {
+                    const kanjiWritingView = await kanjiDB.get(writing)
+
+                    if (
+                        (knownValue === 'writing' && !kanjiWritingView.writing) ||
+                        (knownValue === 'reading' && !kanjiWritingView.kun_readings[0] && !kanjiWritingView.on_readings[0]) ||
+                        (knownValue === 'meaning' && !kanjiWritingView.meanings[0]) 
+                    ) continue
+                    
+                    kanjisFullInfo.push({
+                        writing: kanjiWritingView.writing,
+                        kun_readings: kanjiWritingView.kun_readings,
+                        on_readings: kanjiWritingView.on_readings,
+                        meanings: kanjiWritingView.meanings
+                    })
+                    
+                } catch (error) {
+                    kanjisFullInfo.push({
+                        writing: writing,
+                        kun_readings: [],
+                        on_readings: [],
+                        meanings: []
+                    })
+                }
+
+            }
+            return kanjisFullInfo
+            
+        } catch (error) {
+            console.log(error)
+
+            return kanjis.map(kanji => {
+                return {
+                    writing: kanji,
+                    kun_readings: [],
+                    on_readings: [],
+                    meanings: []
+                }
+            })
+        }
     }
     async function prepareKanjis(roughKanjis: IKanjiWithPointsView[], options: {sort: sortType, descending: boolean}): Promise<string[]> {
         const briefKanjis = getBriefKanjis(roughKanjis)
@@ -256,15 +306,15 @@ export async function GET(req: NextRequest) {
 
         return kanjis.sort((a, b) => {
             switch (knownValue) {
-                case 'known_writing':
+                case 'writing':
                     return descending ? 
                         b.points.known_writing[sort.pointsOf] - a.points.known_writing[sort.pointsOf] : 
                         a.points.known_writing[sort.pointsOf] - b.points.known_writing[sort.pointsOf]
-                case 'known_meaning':
+                case 'meaning':
                     return descending ? 
                         b.points.known_meaning[sort.pointsOf] - a.points.known_meaning[sort.pointsOf] : 
                         a.points.known_meaning[sort.pointsOf] - b.points.known_meaning[sort.pointsOf]
-                case 'known_reading':
+                case 'reading':
                     return descending ? 
                         b.points.known_reading[sort.pointsOf] - a.points.known_reading[sort.pointsOf] : 
                         a.points.known_reading[sort.pointsOf] - b.points.known_reading[sort.pointsOf]
@@ -285,7 +335,7 @@ export async function DELETE(req: NextRequest) {
         }, {status: 400})
     
         const nanoServer = nano(DB_URI)
-        const usersDB = nanoServer.db.use('users')
+        const usersDB: nano.DocumentScope<IUserDoc> = nanoServer.db.use('users')
 
         const user = await getUser(usersDB)
     

@@ -41,9 +41,6 @@
 .container a {
     background-color: #F9E7F8;
 }
-.known-meaning, .known-reading {
-    cursor: default;
-}
 .mode-box h2 {
     text-align: center;
     color: #5E4D56;
@@ -59,7 +56,7 @@
     font-size: 160px;
 }
 
-.known-writing:hover .known-value {
+.mode-box:hover .known-value {
     color: #917991
 }
 

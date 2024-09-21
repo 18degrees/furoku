@@ -1,8 +1,9 @@
-import { IUserDoc, usersKanji } from "@/app/interfaces/db.interface"
+import { IUserDoc, usersKanji } from "@/app/interfaces/user.interface"
 import { UnreachablePathError, WrongPathError } from "../../errors"
 import getUser from "../../auxiliaries/getUser"
 import { NextRequest } from "next/server"
 import nano from "nano"
+import { IDBKanji, ITestKanji } from "@/app/interfaces/kanji.interface"
 
 const DB_URI = process.env.COUCHDB_URI!
 
@@ -21,34 +22,37 @@ const BAD_POINTS = -2
 
 const TIME_IMPORTANCE = 0.5
 
-interface IKnownWritingView {
-    id: string;
-    key: string;
-    value: {
-        writing: string
-        points: number
-        test_timestamp: number
-    };
-    doc?: nano.Document | undefined;
+interface IKanjiView {
+    writing: string
+    points: number
+    test_timestamp: number
 }
+// interface IKnownWritingView {
+//     id: string;
+//     key: string;
+//     value: {
+//         writing: string
+//         points: number
+//         test_timestamp: number
+//     };
+//     doc?: nano.Document | undefined;
+// }
 
 interface IKanjiWithPoints {
     writing: string
     points: number
 }
 
-type modeType = 'known_writing' | 'known_reading' | 'known_meaning' | null
+type modeType = 'known_writing' | 'known_reading' | 'known_meaning'
 
 export async function GET(req: NextRequest) {
     try {
         const mode = getCorrectMode(req)
 
-        if (mode === 'known_meaning' || mode === 'known_reading') throw new UnreachablePathError('Путь пока недоступен')
-
         if (!mode) throw new WrongPathError('Неверный путь')
 
         const nanoServer = nano(DB_URI)
-        const usersDB = nanoServer.db.use('users')
+        const usersDB: nano.DocumentScope<IUserDoc> = nanoServer.db.use('users')
 
         const user = await getUser(usersDB)
 
@@ -56,7 +60,7 @@ export async function GET(req: NextRequest) {
             message: 'Пользователь не авторизован'
         }, {status: 403})
 
-        const kanjisView = await usersDB.view('for_test', mode, {key: user.email})
+        const kanjisView: nano.DocumentViewResponse<IKanjiView, IUserDoc> = await usersDB.view('for_test', mode, {key: user.email})
 
         const kanjisAmount = kanjisView.total_rows 
 
@@ -66,7 +70,7 @@ export async function GET(req: NextRequest) {
             })
         }
 
-        const kanjis = kanjisView.rows as IKnownWritingView[]
+        const kanjis = kanjisView.rows.map(obj => obj.value)
 
         const readyToTestKanjis = getReadyToTestKanjis(kanjis)
 
@@ -75,7 +79,7 @@ export async function GET(req: NextRequest) {
                 kanjis: null
             })
         }
-        const preparedKanjis = getNeededKanjis(readyToTestKanjis)
+        const preparedKanjis = await getNeededKanjis(readyToTestKanjis, mode)
 
         return Response.json({
             kanjis: preparedKanjis
@@ -101,20 +105,20 @@ export async function GET(req: NextRequest) {
         }, {status: 500})
     }
 }
-function getCorrectMode(req: NextRequest): modeType {
+function getCorrectMode(req: NextRequest): modeType | null {
     const modeRough = req.nextUrl.pathname.split('/')[3].trim().toLowerCase()
 
     if (modeRough === 'known_writing' || modeRough === 'known_meaning' || modeRough === 'known_reading') return modeRough
 
     return null
 }
-function getReadyToTestKanjis(kanjis: IKnownWritingView[]): IKnownWritingView[] | null {
-    const readyToTest: IKnownWritingView[] = []
+function getReadyToTestKanjis(kanjis: IKanjiView[]): IKanjiView[] | null {
+    const readyToTest: IKanjiView[] = []
 
     let isThereToTest = false
 
     kanjis.forEach(kanjiObj => {
-        const lastTimeCheckTimestamp = kanjiObj.value.test_timestamp
+        const lastTimeCheckTimestamp = kanjiObj.test_timestamp
         
         const currentTimestamp = Date.now()
 
@@ -128,24 +132,61 @@ function getReadyToTestKanjis(kanjis: IKnownWritingView[]): IKnownWritingView[] 
 
     return readyToTest
 }
-function getNeededKanjis(kanjis: IKnownWritingView[]) {
+async function getNeededKanjis(kanjis: IKanjiView[], mode: modeType): Promise<ITestKanji[]> {
     const kanjisTimeConsidered = getKanjisWithTimeConsideredPoints(kanjis)
 
     sortByPoints(kanjisTimeConsidered)
 
     const cutKanjis = getCutKanjis(kanjisTimeConsidered)
 
-    return cutKanjis
+    const neededInfoOfKanji: ITestKanji[] = []
+
+    if (mode !== 'known_writing') {
+        for (const writing of cutKanjis) {
+            try {
+                const nanoServer = nano(DB_URI)
+                const kanjiDB: nano.DocumentScope<IDBKanji> = nanoServer.db.use('kanji')
+
+                const kanjiObj = await kanjiDB.get(writing)
+
+                if (mode === 'known_reading') {
+                    if (!kanjiObj.kun_readings[0]) continue
+
+                    neededInfoOfKanji.push({
+                        writing,
+                        kun_readings: kanjiObj.kun_readings
+                    })
+                }    
+                if (mode === 'known_meaning') {
+                    if (!kanjiObj.meanings[0]) continue
+
+                    neededInfoOfKanji.push({
+                        writing,
+                        meanings: kanjiObj.meanings
+                    })
+                }
+                
+            } catch (error) {
+                continue
+            }
+        }
+        return neededInfoOfKanji
+    } else {
+        return cutKanjis.map(writing => {
+            return {writing}
+        })
+    }
+
 }
-function getKanjisWithTimeConsideredPoints(kanjis: IKnownWritingView[]): IKanjiWithPoints[] {
+function getKanjisWithTimeConsideredPoints(kanjis: IKanjiView[]): IKanjiWithPoints[] {
     return kanjis.map(kanji => {
-        const testedDaysAgo = Math.trunc((Date.now() - kanji.value.test_timestamp) / (1000 * 60 * 60 * 24))
-        const points = kanji.value.points
+        const testedDaysAgo = Math.trunc((Date.now() - kanji.test_timestamp) / (1000 * 60 * 60 * 24))
+        const points = kanji.points
 
         const pointsTimeConsidered = points - (testedDaysAgo * TIME_IMPORTANCE)
 
         return {
-            writing: kanji.value.writing,
+            writing: kanji.writing,
             points: pointsTimeConsidered
         }
     })
@@ -165,27 +206,31 @@ function getCutKanjis(kanjis: IKanjiWithPoints[]): string[] {
 type knowledgeLevelType = 'well' | 'medium' | 'bad' 
 
 type knownWritingParams = {
+    mode: 'known_writing'
     writing: string
     readingKnowledge: knowledgeLevelType
     meaningKnowledge: knowledgeLevelType
 }
-type pointsObj = {
-    points: number
-    extra_points: number
+type knownMeaningParams = {
+    mode: 'known_meaning'
+    writing: string
+    readingKnowledge: knowledgeLevelType
+    writingKnowledge: knowledgeLevelType
 }
-interface IKnownWritingPoints {
-    currentReadingKnowledge: pointsObj
-    currentMeaningKnowledge: pointsObj
+type knownReadingParams = {
+    mode: 'known_reading'
+    writing: string
+    writingKnowledge: knowledgeLevelType
+    meaningKnowledge: knowledgeLevelType
 }
+
 
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json()
 
         const mode = getCorrectMode(req)
-    
-        if (mode === 'known_meaning' || mode === 'known_reading') throw new UnreachablePathError('Путь пока недоступен')
-        
+            
         if (!mode) throw new WrongPathError('Неверный путь')
 
         const params = getParams(body, mode)
@@ -195,7 +240,7 @@ export async function POST(req: NextRequest) {
         }, {status: 400})
 
         const nanoServer = nano(DB_URI)
-        const usersDB = nanoServer.db.use('users')
+        const usersDB: nano.DocumentScope<IUserDoc> = nanoServer.db.use('users')
         
         const user = await getUser(usersDB)
         
@@ -211,7 +256,7 @@ export async function POST(req: NextRequest) {
         
         if (!currentKanjiObj) throw new Error()
 
-        const updatedKanjiObj = getUpdKanjiObj(currentKanjiObj, mode, params)
+        const updatedKanjiObj = getUpdKanjiObj(currentKanjiObj, params)
 
         const updKanjis = getUpdKanjis(kanjis, updatedKanjiObj)
 
@@ -246,7 +291,7 @@ export async function POST(req: NextRequest) {
     }, {status: 500})
     }
 }
-function getParams(body: any, mode: modeType): knownWritingParams | null {
+function getParams(body: any, mode: modeType): knownWritingParams | knownReadingParams | knownMeaningParams | null {
     if (!body) return null
 
     const writing = typeof body?.writing === 'string' ? body.writing : null
@@ -254,16 +299,42 @@ function getParams(body: any, mode: modeType): knownWritingParams | null {
     if (!writing) return null
 
     switch (mode) {
-        case 'known_writing':
+        case 'known_writing': {
             const {readingKnowledge, meaningKnowledge} = body
 
             if (!readingKnowledge || !meaningKnowledge) return null
 
             return {
+                mode: 'known_writing',
                 writing,
                 readingKnowledge,
                 meaningKnowledge
             }
+        }
+        case 'known_reading': {
+            const {writingKnowledge, meaningKnowledge} = body
+
+            if (!writingKnowledge || !meaningKnowledge) return null
+
+            return {
+                mode: 'known_reading',
+                writing,
+                writingKnowledge,
+                meaningKnowledge
+            }
+        }
+        case 'known_meaning': {
+            const {readingKnowledge, writingKnowledge} = body
+
+            if (!readingKnowledge || !writingKnowledge) return null
+
+            return {
+                mode: 'known_meaning',
+                writing,
+                readingKnowledge,
+                writingKnowledge
+            }
+        }
         default:
             return null
     }
@@ -278,36 +349,91 @@ function getCurrentKanji(currentWriting: string, allKanjis: usersKanji[]): users
     }
     return null
 }
-function getUpdKanjiObj(kanjiObj: usersKanji, mode: 'known_writing', params: knownWritingParams): usersKanji {
-    switch (mode) {
-        case 'known_writing':
-            const meaning = getPoints(kanjiObj, params.meaningKnowledge, 'meaning')
-            const reading = getPoints(kanjiObj, params.readingKnowledge, 'reading')
-        
-            const timestamp = Date.now()
-            
-            kanjiObj.points[mode].meaning.points = meaning.updPoints
-            kanjiObj.points[mode].meaning.extra_points = meaning.updExtraPoints
-            
-            kanjiObj.points[mode].reading.points = reading.updPoints
-            kanjiObj.points[mode].reading.extra_points = reading.updExtraPoints
+function getUpdKanjiObj(kanjiObj: usersKanji, params: knownWritingParams | knownReadingParams | knownMeaningParams): usersKanji {
+    const timestamp = Date.now()
 
-            kanjiObj.points.total = kanjiObj.points[mode].total = meaning.updPoints + reading.updPoints                 //поскольку режим тестирования пока один, общее число очков = числу очков в этом режиме 
-        
-            kanjiObj.points[mode].test_timestamp = timestamp
+    switch (params.mode) {
+        case 'known_writing': {
+            const meaning = getPoints({kanjiObj, answer: params.meaningKnowledge, knowledgeOf: 'meaning', known: 'writing'})
+            const reading = getPoints({kanjiObj, answer: params.readingKnowledge, knowledgeOf: 'reading', known: 'writing'})
             
-            return kanjiObj
+            kanjiObj.points[params.mode].meaning.points = meaning.updPoints
+            kanjiObj.points[params.mode].meaning.extra_points = meaning.updExtraPoints
+            
+            kanjiObj.points[params.mode].reading.points = reading.updPoints
+            kanjiObj.points[params.mode].reading.extra_points = reading.updExtraPoints
+
+            kanjiObj.points[params.mode].total = meaning.updPoints + reading.updPoints
+            break
+        }
+        case 'known_reading': {
+            const writing = getPoints({kanjiObj, answer: params.writingKnowledge, knowledgeOf: 'writing', known: 'reading'})
+            const meaning = getPoints({kanjiObj, answer: params.meaningKnowledge, knowledgeOf: 'meaning', known: 'reading'})
+                    
+            kanjiObj.points[params.mode].meaning.points = meaning.updPoints
+            kanjiObj.points[params.mode].meaning.extra_points = meaning.updExtraPoints
+            
+            kanjiObj.points[params.mode].writing.points = writing.updPoints
+            kanjiObj.points[params.mode].writing.extra_points = writing.updExtraPoints
+
+            kanjiObj.points[params.mode].total = meaning.updPoints + writing.updPoints
+            break
+        }
+        case 'known_meaning': {
+            const writing = getPoints({kanjiObj, answer: params.writingKnowledge, knowledgeOf: 'writing', known: 'meaning'})
+            const reading = getPoints({kanjiObj, answer: params.readingKnowledge, knowledgeOf: 'reading', known: 'meaning'})
+                    
+            kanjiObj.points[params.mode].writing.points = writing.updPoints
+            kanjiObj.points[params.mode].writing.extra_points = writing.updExtraPoints
+            
+            kanjiObj.points[params.mode].reading.points = reading.updPoints
+            kanjiObj.points[params.mode].reading.extra_points = reading.updExtraPoints
+
+            kanjiObj.points[params.mode].total = writing.updPoints + reading.updPoints
+            break
+        }
+
     }
+    kanjiObj.points.total = kanjiObj.points.known_meaning.total + kanjiObj.points.known_reading.total + kanjiObj.points.known_writing.total
+    
+    kanjiObj.points[params.mode].test_timestamp = timestamp
+
+    return kanjiObj
+}
+interface IGetPointsProps {
+    kanjiObj: usersKanji
+    answer: knowledgeLevelType
+    known: 'writing' | 'reading' | 'meaning'
+    knowledgeOf: 'meaning' | 'reading' | 'writing'
+    
 }
 interface IPoints {
     updPoints: number
     updExtraPoints: number
 }
-type knowledgeType = 'meaning' | 'reading'
+type knowledgeType = 'meaning' | 'reading' | 'writing'
 
-function getPoints(kanjiObj: usersKanji, answer: knowledgeLevelType, knowledge: knowledgeType): IPoints {
-    const prevExtra = kanjiObj.points.known_writing[knowledge].extra_points
-    const prevPoints = kanjiObj.points.known_writing[knowledge].points
+function getPoints({kanjiObj, answer, known, knowledgeOf}: IGetPointsProps): IPoints {
+    const prevExtra = (
+        known === 'writing' && knowledgeOf === 'meaning' ? kanjiObj.points.known_writing.meaning.extra_points :
+        known === 'writing' && knowledgeOf === 'reading' ? kanjiObj.points.known_writing.reading.extra_points :
+
+        known === 'meaning' && knowledgeOf === 'writing' ? kanjiObj.points.known_meaning.writing.extra_points :
+        known === 'meaning' && knowledgeOf === 'reading' ? kanjiObj.points.known_meaning.reading.extra_points :
+
+        known === 'reading' && knowledgeOf === 'writing' ? kanjiObj.points.known_reading.writing.extra_points :
+        known === 'reading' && knowledgeOf === 'meaning' ? kanjiObj.points.known_reading.meaning.extra_points : 0
+    )
+    const prevPoints = (
+        known === 'writing' && knowledgeOf === 'meaning' ? kanjiObj.points.known_writing.meaning.points :
+        known === 'writing' && knowledgeOf === 'reading' ? kanjiObj.points.known_writing.reading.points :
+
+        known === 'meaning' && knowledgeOf === 'writing' ? kanjiObj.points.known_meaning.writing.points :
+        known === 'meaning' && knowledgeOf === 'reading' ? kanjiObj.points.known_meaning.reading.points :
+
+        known === 'reading' && knowledgeOf === 'writing' ? kanjiObj.points.known_reading.writing.points :
+        known === 'reading' && knowledgeOf === 'meaning' ? kanjiObj.points.known_reading.meaning.points : 0
+    )
 
     let updExtraPoints;
     let updPoints;

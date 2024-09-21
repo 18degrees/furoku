@@ -1,5 +1,5 @@
 import { EMAIL_PATTERN, PASSWORD_LENGTH } from "@/app/patterns/auth"
-import { IUserDoc, usersKanji } from "@/app/interfaces/db.interface"
+import { IUserDoc, usersKanji } from "@/app/interfaces/user.interface"
 import { NextRequest } from "next/server"
 import nodemailer from 'nodemailer'
 import bcrypt from 'bcrypt'

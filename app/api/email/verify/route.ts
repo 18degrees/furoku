@@ -1,7 +1,7 @@
-import { EMAIL_PATTERN } from "@/app/patterns/auth";
-import { NextRequest } from "next/server";
+import { ICodeDoc } from "@/app/interfaces/code.interface"
+import { EMAIL_PATTERN } from "@/app/patterns/auth"
+import { NextRequest } from "next/server"
 import nano from "nano"
-import { ICodeDoc } from "@/app/interfaces/db.interface";
 
 interface IRequestBody {
     email: any

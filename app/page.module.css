@@ -32,11 +32,16 @@
 }
 .container h2 {
     font-size: 30px;
-    color: #8a778e;
+    color: #8e8693;
 }
-.container h2 + p > ul {
+.text-block p, 
+.container p + ul,
+.text-block table {
+    margin-bottom: 15px;
+}
+.container p + ul {
     list-style: none;
-    padding-left: 0;
+    padding-left: 10px;
 }
 .container h3 {
     font-size: 23px;
@@ -45,23 +50,34 @@
     margin: auto;
     max-width: 800px;
     font-size: 21px;
-    color: #5c525e
+    color: #6e6872
 }
 .text-block {
     margin-bottom: 50px;
 }
-.text-block p {
-    margin-bottom: 15px;
+
+.text-block table {
+    text-align: center;
+    border-collapse: collapse;
 }
-.text-block i {
-    display: block;
-    margin: 10px 0 0 10px;
+.text-block table th {
+    font-weight: 400;
+    padding: 0 20px;
+    border: 1px solid #6e6872
+}
+.text-block table td {
+    border: 1px solid #6e6872;
+    padding: 5px 0;
+}
+.text-block li, .text-block li {
+    padding: 2px;
 }
 .text-block ol {
     margin-top: 5px;
+    padding-left: 28px
 }
 .text-block ol li {
-    margin-bottom: 3px;
+    padding: 2px;
 }
 
 @media screen and (max-width: 1300px) {

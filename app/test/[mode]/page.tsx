@@ -1,19 +1,20 @@
 "use client"
 
 import { IDefaultBodyResponse } from "@/app/interfaces/response.interface"
-import { KnownWritingForm } from "../components/forms/Test-forms"
+import { KnownWritingForm, KnownMeaningForm, KnownReadingForm } from "../components/forms/Test-forms"
 import { useCallback, useEffect, useState } from "react"
 import { useHttp } from "@/app/hooks/http.hook"
 import style from './page.module.css'
 import Link from "next/link"
+import { ITestKanji } from "@/app/interfaces/kanji.interface"
 
 type knowledgeLevelType = 'well' | 'medium' | 'bad' | null
 
 interface IResponseBody extends IDefaultBodyResponse {
-    kanjis: [string] | null
+    kanjis: ITestKanji[] | null
 }
 export default function Test({params}: {params: {mode : string}}) {
-    const [kanjis, setKanjis] = useState<string[] | null>(null)
+    const [kanjisInfo, setKanjisInfo] = useState<ITestKanji[] | null>(null)
     const {request} = useHttp()
     const [pageNumber, setPageNumber] = useState(1)
     const [maxPageNumber, setMaxPageNumber] = useState(1)
@@ -40,7 +41,7 @@ export default function Test({params}: {params: {mode : string}}) {
 
             const resKanjis = await getKanjis()
 
-            setKanjis(resKanjis)
+            setKanjisInfo(resKanjis)
 
             if (resKanjis) setMaxPageNumber(resKanjis.length)
 
@@ -57,6 +58,24 @@ export default function Test({params}: {params: {mode : string}}) {
                 return null
             }
         }
+
+        // function getNeededInfo(resKanjis: ITestKanji[]) {
+        //     const neededInfo: string[] = []
+
+        //     for (const kanjiObj of resKanjis) {
+        //         switch (params.mode) {
+        //             case 'known_reading':
+        //                 if (kanjiObj.kun_readings) neededInfo.push(kanjiObj.kun_readings)
+        //                 break;
+        //             case 'known_meaning':
+        //                 if (kanjiObj.meanings) neededInfo.push(kanjiObj.meanings)
+        //                 break;
+        //             default:
+        //                 neededInfo.push(kanjiObj.writing)
+        //         }
+        //     }
+        //     return neededInfo
+        // }
         startTest()
     }, [params.mode, request])
 
@@ -86,7 +105,7 @@ export default function Test({params}: {params: {mode : string}}) {
         }
     }
     async function savePoints() {
-        const writing =  kanjis ? kanjis[pageNumber - 1] : null
+        const writing = kanjisInfo ? kanjisInfo[pageNumber - 1].writing : null
 
         if (!writing) return
 
@@ -117,19 +136,38 @@ export default function Test({params}: {params: {mode : string}}) {
     }
     return (
         <div className={style.container}>
-            {kanjis && params.mode === 'known_writing' && !isTestFinished ? (
+            {kanjisInfo && (params.mode === 'known_writing' || params.mode === 'known_reading' || params.mode === 'known_meaning') && !isTestFinished ? (
                 <div className={style['test-container']}>
                     <span className={style['page-count']}>{`${pageNumber} / ${maxPageNumber}`}</span>
                     <div className={style['writing-block']}>
-                        <span className={style.writing}>{kanjis[pageNumber - 1]}</span>
+                        <span className={`${style.writing} writing`}>{
+                            params.mode === 'known_reading' && kanjisInfo[pageNumber - 1].kun_readings ?  kanjisInfo[pageNumber - 1].kun_readings!.join(';\n') :
+                            params.mode === 'known_meaning' && kanjisInfo[pageNumber - 1].meanings ?  kanjisInfo[pageNumber - 1].meanings!.join(';\n') :
+                            kanjisInfo[pageNumber - 1].writing
+                        }</span>
                     </div>
 
-                    <KnownWritingForm 
-                        readingKnowledge={readingKnowledge} 
-                        meaningKnowledge={meaningKnowledge} 
-                        setReadingKnowledge={setReadingKnowledge} 
-                        setMeaningKnowledge={setMeaningKnowledge}
-                    />
+                    { 
+                        params.mode === 'known_writing' ? <KnownWritingForm 
+                            readingKnowledge={readingKnowledge} 
+                            meaningKnowledge={meaningKnowledge} 
+                            setReadingKnowledge={setReadingKnowledge} 
+                            setMeaningKnowledge={setMeaningKnowledge}
+                        /> : 
+                        params.mode === 'known_reading' ? <KnownReadingForm 
+                            writingKnowledge={writingKnowledge}
+                            meaningKnowledge={meaningKnowledge}
+                            setWritingKnowledge={setWritingKnowledge} 
+                            setMeaningKnowledge={setMeaningKnowledge}
+                        /> :
+                        params.mode === 'known_meaning' ? <KnownMeaningForm 
+                            writingKnowledge={writingKnowledge}
+                            readingKnowledge={readingKnowledge}
+                            setWritingKnowledge={setWritingKnowledge} 
+                            setReadingKnowledge={setReadingKnowledge}
+                        /> :
+                        <p>Выбран неверный режим тестирования</p>
+                    }
 
                     <button
                         disabled={btnDisabled}
@@ -155,6 +193,13 @@ export default function Test({params}: {params: {mode : string}}) {
                 </div>
             )
             }
+            <style jsx>{`
+                .writing {
+                    font-size: ${params.mode === 'known_writing' ? 200 : 35}px
+                }
+            `}
+
+            </style>
         </div>
     )
 }

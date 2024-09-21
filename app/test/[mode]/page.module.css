@@ -32,10 +32,10 @@
 
 }
 .writing {
-    font-size: 200px;
     font-weight: 100;
     margin: auto 0 auto 0;
-    color: #A2889A
+    color: #A2889A;
+    white-space: pre-line
 }
 .test-container button {
     margin: auto;

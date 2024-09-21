@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-    title: 'Кандзи по популярности',
-    description: "Иероглифы, отсортированные по частоте употребления и доступные для повторения"
+    title: 'Список кандзи',
+    description: 'Иероглифы, отсортированные по: jlpt, частоте употребления, классу прохождения, количеству черт'
 }
 
 export default function Layout({children}: {children: React.ReactNode}) {

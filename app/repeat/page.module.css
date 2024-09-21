@@ -9,109 +9,209 @@
     right: 15px;
     bottom: 15px;
 }
-.container h1 {
-    margin: 40px auto 80px;
-    width: fit-content;
-    text-align: center;
-    color: #a691a7;
-}
-.top-block {
+
+.sort-container {
+    margin: 40px auto 30px auto;
     display: flex;
-    justify-content: center;
-    margin-bottom: 80px;
+    width: fit-content;
+    font-size: 17px;
 }
-.primary-kanji {
-    font-size: 180px;
-    text-align: center;
-    line-height: 350px;
-    background-color: #f1e4f3;
-    box-shadow: 2px 4px rgb(212 192 212 / 50%);
-    min-width: 250px;
-    max-width: 350px;
-    width: 50%;
+.sort-container > div {
+    position: relative;
+}
+.sort-container > div:first-of-type {
     margin-right: 50px;
-    color: #6D5666;
 }
-.menu {
-    width: 250px;
-    padding: 20px 30px;
-    background-color: #e4d4e4;
-    font-size: 17px;
-    color: #463c45;
-    box-shadow: 2px 4px rgb(181 163 181 / 50%)
-}
-.menu select {
-    font-size: 17px;
-    display: block;
-    width: 100%;
+.sort-container .field {
     margin-top: 5px;
-    padding: 10px;
-    background-color: #fef0ff;
-    border-radius: 5px;
-}
-.menu select:first-of-type {
-    margin-bottom: 30px;
-}
-.interaction {
-    margin-top: 60px;
-}
-.interaction button:disabled {
-    background-color: #f9edfc;
-    box-shadow: unset;
-}
-.interaction > div { 
+    padding: 8px 12px;
+    width: 160px;
+    background-color: #FFF2FF;
     display: flex;
     justify-content: space-between;
 }
-.interaction > div > :first-of-type {
-    margin-right: 10px;
+.sort-container .field span {
+    transform: translateY(-3px);
 }
-.interaction button {
-    box-shadow: 2px 2px rgb(181 166 181 / 50%);
-    background-color: #fef0ff;
-    border-radius: 5px;
+.sort-container ul {
+    list-style: none;
+    padding: 0 8px;
+    background-color: #FFF2FF;
+    color: #232323;
+    position: absolute;
+    top: 61px;
+    width: 160px;
+    height: 0px;
+    overflow: hidden;
+    transition: .5s all;
+    z-index: 100;
 }
-.interaction .copy {
-    font-size: 16px;
-    width: 145px;
-    height: 45px;
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-    color: #877685;
+.sort-container > div.active ul {
+    height: 112px;
 }
-.interaction .remove {
-    width: 45px;
-    height: 45px;
+.sort-container > div span {
+    transition: .5s all;
+}
+.sort-container > div.active span {
+    transform: rotate(180deg) translateY(-2px);
+}
+.sort-container ul li {
+    padding: 7px 4px;
+}
+.sort-container ul li:first-of-type {
+    margin-top: 0;
+}
+.sort-container ul li.active {
+    background-color: #f2e7f2;
+}
+
+.primary-block, .kanjis, .words {
+    max-width: 720px;
+}
+.primary-block {
+    margin: auto;
 }
 .direction {
-    margin-top: 30px;
+    width: fit-content;
+    margin-left: auto;
 }
 .direction button {
-    width: 80px;
-    height: 45px;
+    width: 60px;
+    height: 30px;
+    background-color: #F6E6F4;
+    border: 1px solid #C6AEC6;
+}
+.direction .prev {
+    margin-right: 10px;
 }
 .direction .prev svg {
     transform: rotate(180deg);
 }
-.other-kanji, .non-kanji-plug {
-    margin-bottom: 60px;
+.direction button:disabled {
+    border: 1px solid #E3D1E3;
 }
-.other-kanji {
-    font-size: 80px;
+
+.kanji-block {
+    margin: 5px 0 5px 0;
+    padding: 40px 30px 50px 30px;
+    background-color: #F6E6F4;
+    border: 1px solid #C6AEC6;
+    display: grid;
+    grid-template-areas: 
+        "A A  B"
+        "A A  B"
+        "A A  C";
+    justify-items: center;
+    user-select: text;
+}
+.kanji-block h2 {
+    user-select: none;
+    text-align: center;
+    color:#604f5e
+}
+.writing {
+    grid-area: A;
+    text-align: center;
+}
+.reading {
+    grid-area: B;
+}
+.meaning {
+    grid-area: C;
+}
+.writing p,
+.reading > div,
+.meaning p {
+    color: transparent;
+}
+.writing p {
+    transform: translateY(25px);
+}
+.reading > div {
+    min-height: 150px;
+}
+.meaning p {
+    min-height: 80px;
+}
+.writing .active,
+.reading .active,
+.meaning .active {
+    color: #604f5e;
+}
+.reading h2,
+.meaning h2 {
+    margin-bottom: 10px;
+}
+.meaning p, .reading p {
+    width: 250px;
+}
+.writing p {
+    font-size: 160px;
+}
+.reading p {
+    font-size: 19px;
+}
+.meaning p {
+    font-size: 20px;
+}
+.reading {
+    margin-bottom: 30px;
+}
+.reading > div > div:first-of-type {
+    margin-bottom: 15px;
+}
+
+.interaction {
+    display: flex;
+    justify-content: space-between;
+}
+.interaction button {
+    font-size: 22px;
+    background-color: #F6E6F4;
+    width: 40px;
+    height: 40px;
+    padding-top: 5px;
+}
+.interaction > div button {
+    margin-right: 10px;
+    border: 1px solid #b0b0b0
+}
+.remove {
+    border: 1px solid #A2808D
+}
+.interaction button.transparent {
+    opacity: .3
+}
+
+.kanjis, .non-kanji-plug, .words {
+    margin: 50px auto 60px auto;
+}
+.kanjis, .words {
     color: #8E7C8E;
+}
+.kanjis {
+    font-size: 70px;
     display: grid;
     grid-template-columns: repeat(auto-fill, 140px);
     column-gap: 20px;
     row-gap: 20px;
     justify-content: center;
 }
-.other-kanji span {
-    text-align: center;
+.words {
+    font-size: 24px;
 }
 
+.kanjis span {
+    text-align: center;
+}
+.words span {
+    display: block;
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+}
 .current {
-    background-color: #f1e4f3;
+    background-color: #F6E6F4;
 }
 .non-kanji-plug {
     text-align: center;
@@ -119,15 +219,30 @@
     color: #544555
 }
 
-@media screen and (max-width: 1100px) {
-    .top-block {
-        flex-direction: column-reverse;
-        align-items: center;
+@media screen and (max-width: 1050px) {
+    .container {
+        width: 80%
     }
-    .primary-kanji {
-        margin: 0;
+    .sort-container {
+        display: block;
     }
-    .menu {
-        margin-bottom: 50px;
+    .sort-container > div:first-of-type {
+        margin: 0 0 40px 0;
+    }
+    .direction {
+        margin: auto;
+    }
+    .kanji-block {
+        display: block;
+    }
+    .meaning p, .reading p {
+        width: fit-content;
+    }
+    .writing p {
+        font-size: 100px;
+        transform: translateY(0);
+    }
+    .meaning p {
+        min-height: auto;
     }
 }

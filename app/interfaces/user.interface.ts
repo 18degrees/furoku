@@ -1,10 +1,8 @@
 export interface IUserDoc {
-    _id: string
     email: string
     hashed_password: string
     signup_date: Date
     kanjis?: usersKanji[]
-    _rev?: string
 }
 
 export interface usersKanji {
@@ -49,15 +47,4 @@ export interface usersKanji {
         }
     }
     addition_timestamp: number
-}
-
-export type codeInfoType = {
-    code: string, 
-    expires: number
-}
-
-export interface ICodeDoc {
-    _id: string
-    _rev?: string
-    codes: [{code: string, expires: number}]
 }

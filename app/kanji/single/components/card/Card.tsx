@@ -11,7 +11,7 @@ interface FilledCard {
     mode: 'FILLED'
     isCardAdded: boolean
     writing: string
-    frequency: string
+    index: string
     setHasCardJustBeenAdded: (isAdded: boolean) => void
 }
 interface PreloadCard {
@@ -29,7 +29,7 @@ export function Card(props: CardProps) {
     const alerts = useContext(AlertsContext)
 
     const writing = mode === 'PRELOAD' ? '?' : props.writing
-    const frequency = mode === 'PRELOAD' ? 'загрузка...' : props.frequency
+    const frequency = mode === 'PRELOAD' ? 'загрузка...' : props.index
 
     async function addKanji() {
         if (mode === 'PRELOAD') return

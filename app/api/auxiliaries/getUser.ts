@@ -1,9 +1,9 @@
-import { IUserDoc } from "@/app/interfaces/db.interface"
+import { IUserDoc } from "@/app/interfaces/user.interface"
 import { authConfig } from "@/app/configs/auth"
 import { getServerSession } from "next-auth"
 import nano from "nano"
 
-export default async function getUser(usersDB: nano.DocumentScope<unknown>) {
+export default async function getUser(usersDB: nano.DocumentScope<IUserDoc>) {
     try {
         const session = await getServerSession(authConfig)
     
@@ -11,9 +11,9 @@ export default async function getUser(usersDB: nano.DocumentScope<unknown>) {
 
         if (!email) return null
     
-        const user = await usersDB.get(email) as IUserDoc | undefined
+        const user = await usersDB.get(email)
     
-        return user ? user : null
+        return user
     } catch (error) {
         return null
     }

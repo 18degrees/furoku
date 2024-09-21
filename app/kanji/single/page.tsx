@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback, useContext } from 'react'
 import { IDefaultBodyResponse } from '../../interfaces/response.interface'
 import { ISearchKanji } from '../../interfaces/kanji.interface'
 import { Spinner } from '../../components/spinner/Spinner'
-import type { TouchEvent, MouseEvent } from 'react'
+import type { TouchEvent, MouseEvent, ChangeEvent } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useHttp } from '../../hooks/http.hook'
 import { Card } from './components/card/Card'
@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation'
 import { alegreya } from '../../fonts'
 import style from './page.module.css'
 import Link from 'next/link'
+import { level, sortMethod } from '@/app/interfaces/search.interface'
 
 interface IBody extends IDefaultBodyResponse {
     kanjis: ISearchKanji[]
@@ -26,7 +27,6 @@ const KANJI_AMOUNT_PER_PAGE = +process.env.NEXT_PUBLIC_KANJI_PER_PAGE!
 
 const onlyKanjiRegExp = /\p{Script=Han}+/ug
 
-type level = '5' | '4' | '3' | '2' | '1' | 'all'
 type includeLearnt = true | false
 type page = number
 type text = string
@@ -40,6 +40,8 @@ export default function Page() {
     const [isLoadingProcessing, setIsLoadingProcessing] = useState(true)
 
     const [searchText, setSearchText] = useState<text>(getTextInitial)
+
+    const [sortMethod, setSortMethod] = useState<sortMethod>(getInitialSortMethod)
 
     const page = useRef<page>(getPageInitial())
     const level = useRef<level>(getLevelInitial())
@@ -55,6 +57,17 @@ export default function Page() {
     
     let touchStartLeftCoord = 0;
 
+    function getInitialSortMethod(): sortMethod {
+        const method = params.get('by')
+
+        return (
+            method === 'jlpt'     || 
+            method === 'stroke'   || 
+            method === 'mainichi' || 
+            method === 'grade'    || 
+            method === 'wiki' ? method : 'jlpt'
+        )
+    }
     function getTextInitial(): text {
         const textRough = params.get('text')
         const text = typeof textRough === 'string' ? textRough : '' 
@@ -156,6 +169,24 @@ export default function Page() {
 
     }, [searchText, router])
     
+    function onSortMethodChange(method: sortMethod) {
+        setSortMethod(method)
+
+        const pathToModify = new URL(window.location.href)
+
+        method === 'jlpt' ? pathToModify.searchParams.delete('by') : pathToModify.searchParams.set('by', method)
+
+        if (page.current !== 1) {
+            pathToModify.searchParams.delete('page')
+            page.current = 1
+        }
+        if (level.current !== 'all') {
+            pathToModify.searchParams.delete('level')
+            level.current = 'all'
+        }
+
+        router.push(`${pathToModify.pathname}${pathToModify.search}`)
+    }
     function onPageIncrement(): void {
         if (page.current !== pagesAmount.current) {
             changePage(page.current + 1)
@@ -197,7 +228,7 @@ export default function Page() {
                     return (
                         <Card 
                             mode='FILLED'
-                            frequency={kanjiInfo.frequency} 
+                            index={kanjiInfo.index} 
                             writing={kanjiInfo.writing}  
                             key={kanjiInfo.id} 
                             isCardAdded={kanjiInfo.added}
@@ -337,14 +368,67 @@ export default function Page() {
     return (
         <div className={`${style.container}`}>
             {isLoadingProcessing ? <div className={style.spinner}><Spinner size={50}/></div> : null}
-            <div className={style['top-block']}>
-                <div className={style.description}>
-                    <h1 className={alegreya.className}>Список иероглифов</h1>
-                    <p>Здесь собраны и отсортированы по <Link href='/#frequency'>частоте&#160;употребления</Link> иероглифы, которые доступны для сохранения и повторения.</p>
-                </div>
-                <div className={style['sort-block']}>
+            <h1 className={alegreya.className}>Список иероглифов</h1>
+            <p className={style.description}>Здесь вы найдёте доступные к повторению иероглифы. Для упрощения поиска используйте сортировку по разным категориям или введите напрямую с помощью поисковой строки</p>
+            <div className={style['sort-block']}>
+                <div>
+                    <p>Отобразить по</p>
+                    <div className={style.radios}>
+                        <label>JLPT
+                            <input 
+                                type='radio' 
+                                name='sort' 
+                                value='jlpt' 
+                                defaultChecked={sortMethod === 'jlpt'} 
+                                onChange={() => onSortMethodChange('jlpt')}
+                                />
+                        </label>
+                        <label>Чертам
+                        <input 
+                                type='radio' 
+                                name='sort' 
+                                value='stroke' 
+                                defaultChecked={sortMethod === 'stroke'} 
+                                onChange={() => onSortMethodChange('stroke')}
+                                />
+                        </label>
+                        <label>Газете "Маинити"
+                        <input 
+                                type='radio' 
+                                name='sort' 
+                                value='mainichi' 
+                                defaultChecked={sortMethod === 'mainichi'} 
+                                onChange={() => onSortMethodChange('mainichi')}
+                                />
+                        </label>
+                        <label>Классу
+                        <input 
+                                type='radio' 
+                                name='sort' 
+                                value='grade' 
+                                defaultChecked={sortMethod === 'grade'} 
+                                onChange={() => onSortMethodChange('grade')}
+                                />
+                        </label>
+                        <label>Частоте в вики
+                        <input 
+                                type='radio' 
+                                name='sort' 
+                                value='wiki' 
+                                defaultChecked={sortMethod === 'wiki'} 
+                                onChange={() => onSortMethodChange('wiki')}
+                                />
+                        </label>
+                    </div>
                     <div>
-                        <select 
+                        <input 
+                            type='text'
+                            onChange={(event) => setSearchText(event.target.value)}
+                            value={searchText}
+                            spellCheck={false}
+                            placeholder='Поиск'
+                        />
+                        {sortMethod === 'wiki' || sortMethod === 'mainichi' ? <select 
                             onChange={(event: React.ChangeEvent<HTMLSelectElement>) => changeLevel(event.target.value as level)}
                             value={level.current}
                             disabled={!!searchText}
@@ -355,24 +439,49 @@ export default function Page() {
                             <option value='3'>Уровень 3</option>
                             <option value='2'>Уровень 2</option>
                             <option value='1'>Уровень 1</option>
-                        </select>
+                        </select> : sortMethod === 'jlpt' ? <select 
+                            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => changeLevel(event.target.value as level)}
+                            value={level.current}
+                            disabled={!!searchText}
+                            >
+                            <option value='all'>Все</option>
+                            <option value='5'>N5</option>
+                            <option value='4'>N4</option>
+                            <option value='3'>N3</option>
+                            <option value='2'>N2</option>
+                            <option value='1'>N1</option>
+                        </select> : sortMethod === 'grade' ? <select 
+                            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => changeLevel(event.target.value as level)}
+                            value={level.current}
+                            disabled={!!searchText}
+                            >
+                            <option value='all'>Все</option>
+                            <option value='1'>Класс 1</option>
+                            <option value='2'>Класс 2</option>
+                            <option value='3'>Класс 3</option>
+                            <option value='4'>Класс 4</option>
+                            <option value='5'>Класс 5</option>
+                            <option value='6'>Класс 6</option>
+                            <option value='7'>Класс 7</option>
+                            <option value='8'>Класс 8</option>
+                            <option value='9'>Класс 9</option>
+                        </select> : <select 
+                            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => changeLevel(event.target.value as level)}
+                            value={level.current}
+                            disabled={true}
+                            >
+                            <option value='all'>Все</option>
+                        </select>}
+                    </div>
+                    <div className={style['checkbox-container']}>
                         <input 
-                            type='text'
-                            onChange={(event) => setSearchText(event.target.value)}
-                            value={searchText}
-                            spellCheck={false}
-                            placeholder='Поиск'
-                        />                    
-                        <div className={style['checkbox-container']}>
-                            <input 
-                                type='checkbox' 
-                                id='learning-include'
-                                onChange={event => changeIncludeLearnt(event.target.checked)}
-                                checked={includeLearnt.current}
-                                disabled={!session}
-                            ></input>
-                            <label htmlFor='learning-include'>Изучаемые</label>
-                        </div>
+                            type='checkbox' 
+                            id='learning-include'
+                            onChange={event => changeIncludeLearnt(event.target.checked)}
+                            checked={includeLearnt.current}
+                            disabled={!session}
+                        ></input>
+                        <label htmlFor='learning-include'>Показать изучаемые</label>
                     </div>
                 </div>
             </div>
