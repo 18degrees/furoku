@@ -392,7 +392,7 @@ export default function Page() {
                                 onChange={() => onSortMethodChange('stroke')}
                                 />
                         </label>
-                        <label>Газете "Маинити"
+                        <label>Газете &quot;Маинити&quot;
                         <input 
                                 type='radio' 
                                 name='sort' 

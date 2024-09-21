@@ -1,6 +1,6 @@
 import { EMAIL_PATTERN, PASSWORD_LENGTH } from "../patterns/auth"
 import Credentials from "next-auth/providers/credentials"
-import { IUserDoc } from "@/app/interfaces/db.interface"
+import { IUserDoc } from "@/app/interfaces/user.interface"
 import { AuthOptions, User } from "next-auth"
 import bcrypt from 'bcrypt'
 import nano from 'nano'
@@ -34,9 +34,9 @@ export const authConfig: AuthOptions = {
                     
                     const nanoServer = nano(DB_URI)
             
-                    const usersDB = nanoServer.db.use('users') as IUsersDB
+                    const usersDB: nano.DocumentScope<IUserDoc> = nanoServer.db.use('users')
         
-                    const user = await usersDB.get(email) as IUserDoc
+                    const user = await usersDB.get(email)
                     
                     const isPasswordCorrect = await bcrypt.compare(password, user.hashed_password)
 
