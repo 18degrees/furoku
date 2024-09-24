@@ -59,7 +59,7 @@ export interface IDBKanji {
 
 export interface ITestKanji {
     writing: string
-    kun_readings?: string[]
+    readings?: string[]
     meanings?: string[]
 }
 

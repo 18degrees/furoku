@@ -53,7 +53,7 @@ export default function Test({params}: {params: {mode : string}}) {
     
                 const kanjis = body.kanjis
 
-                return kanjis
+                return kanjis && kanjis[0] ? kanjis : null
             } catch (error) {
                 return null
             }
@@ -141,7 +141,7 @@ export default function Test({params}: {params: {mode : string}}) {
                     <span className={style['page-count']}>{`${pageNumber} / ${maxPageNumber}`}</span>
                     <div className={style['writing-block']}>
                         <span className={`${style.writing} writing`}>{
-                            params.mode === 'known_reading' && kanjisInfo[pageNumber - 1].kun_readings ?  kanjisInfo[pageNumber - 1].kun_readings!.join(';\n') :
+                            params.mode === 'known_reading' && kanjisInfo[pageNumber - 1].readings ?  kanjisInfo[pageNumber - 1].readings!.join(';\n') :
                             params.mode === 'known_meaning' && kanjisInfo[pageNumber - 1].meanings ?  kanjisInfo[pageNumber - 1].meanings!.join(';\n') :
                             kanjisInfo[pageNumber - 1].writing
                         }</span>

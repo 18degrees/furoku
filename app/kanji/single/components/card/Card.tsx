@@ -11,7 +11,7 @@ interface FilledCard {
     mode: 'FILLED'
     isCardAdded: boolean
     writing: string
-    index: string
+    index?: string
     setHasCardJustBeenAdded: (isAdded: boolean) => void
 }
 interface PreloadCard {
@@ -29,7 +29,7 @@ export function Card(props: CardProps) {
     const alerts = useContext(AlertsContext)
 
     const writing = mode === 'PRELOAD' ? '?' : props.writing
-    const frequency = mode === 'PRELOAD' ? 'загрузка...' : props.index
+    const index = mode === 'PRELOAD' ? 'загрузка...' : props.index
 
     async function addKanji() {
         if (mode === 'PRELOAD') return
@@ -69,7 +69,7 @@ export function Card(props: CardProps) {
             <div 
                 className={`${style.card} ${mode === 'PRELOAD' ? 'blank' : ''}`}
             >
-                <span className={style.frequency}>{frequency}</span>
+                <span className={style.index}>{index ? index : '?'}</span>
                 <span className={`${style.kanji} ${ibm_plex_sans_jp.className}`}>{writing}</span>
                 <div className={`${style['btn-box']} ${session && mode === 'FILLED' ? '' : style.inactive}`}>
                     {

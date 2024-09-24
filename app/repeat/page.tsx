@@ -340,8 +340,8 @@ export default function Profile() {
                             knownValue === 'writing' ? style.kanjis : style.words} 
                             ${knownValue === 'writing' ? shippori_mincho.className : knownValue === 'reading' ? ibm_plex_sans_jp.className : ''}`}
                             >
-                        {kanjis.map(({writing, kun_readings, meanings}) => 
-                            <span 
+                        {kanjis.map(({writing, kun_readings, meanings, on_readings}) => 
+                            <p 
                                 className={
                                     (knownValue === 'writing' && kanjis[index].writing === writing) ||
                                     (knownValue === 'reading' && kanjis[index].kun_readings === kun_readings) ||
@@ -354,11 +354,15 @@ export default function Profile() {
                                 >
                                 {
                                     knownValue === 'writing' ? writing : 
-                                    knownValue === 'reading' && kun_readings ? kun_readings.join('; ') :
+                                    knownValue === 'reading' && (kun_readings[0] && on_readings[0]) ? <><span>{kun_readings.join('; ')}<br/></span><span>{on_readings.join('; ')}</span></> :
+                                    knownValue === 'reading' && (kun_readings[0]) ? kun_readings.join('; ') :
+                                    knownValue === 'reading' && (on_readings[0]) ? on_readings.join('; ') :
+                                    // knownValue === 'reading' && kun_readings[0] ? kun_readings.join('; ') :
+                                    // knownValue === 'reading' && on_readings[0] ? on_readings.join('; ') :
                                     knownValue === 'meaning' && meanings ? meanings.join('; ') : 
-                                    'Не вышло загрузить информацию'
+                                    'Нет данных'
                                 }
-                            </span>
+                            </p>
                         )}
                     </div> : 
                     !isResponseLoading ? 

@@ -150,11 +150,11 @@ async function getNeededKanjis(kanjis: IKanjiView[], mode: modeType): Promise<IT
                 const kanjiObj = await kanjiDB.get(writing)
 
                 if (mode === 'known_reading') {
-                    if (!kanjiObj.kun_readings[0]) continue
+                    if (!kanjiObj.kun_readings[0] && !kanjiObj.on_readings[0]) continue
 
                     neededInfoOfKanji.push({
                         writing,
-                        kun_readings: kanjiObj.kun_readings
+                        readings: kanjiObj.kun_readings.concat(kanjiObj.on_readings)
                     })
                 }    
                 if (mode === 'known_meaning') {
