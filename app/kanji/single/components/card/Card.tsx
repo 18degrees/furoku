@@ -5,14 +5,20 @@ import { useHttp } from '@/app/hooks/http.hook'
 import { useSession } from 'next-auth/react'
 import { useContext, useState } from 'react'
 import { ibm_plex_sans_jp } from '@/app/fonts'
+import { Plus } from './components/Plus'
 import style from './card.module.css'
+import { Minus } from './components/Cross'
+import { IDefaultBodyResponse } from '@/app/interfaces/response.interface'
 
 interface FilledCard {
     mode: 'FILLED'
     isCardAdded: boolean
     writing: string
-    index?: string
-    setHasCardJustBeenAdded: (isAdded: boolean) => void
+    index: {
+        filter?: number
+        sort?: number
+    }
+    setHasStateOfKanjiJustBeenChanged: (isAdded: boolean) => void
 }
 interface PreloadCard {
     mode: 'PRELOAD'
@@ -29,7 +35,8 @@ export function Card(props: CardProps) {
     const alerts = useContext(AlertsContext)
 
     const writing = mode === 'PRELOAD' ? '?' : props.writing
-    const index = mode === 'PRELOAD' ? 'загрузка...' : props.index
+    const sort = mode === 'PRELOAD' ? 'загрузка...' : props.index.sort
+    const filter = mode === 'FILLED' ? props.index.filter : undefined
 
     async function addKanji() {
         if (mode === 'PRELOAD') return
@@ -43,7 +50,7 @@ export function Card(props: CardProps) {
 
             if (body instanceof Error) throw body
             
-            props.setHasCardJustBeenAdded(true)
+            props.setHasStateOfKanjiJustBeenChanged(true)
 
             setIsCardAdded(true)
             
@@ -62,6 +69,35 @@ export function Card(props: CardProps) {
             })
         }
     }
+    async function removeKanji() {
+        if (mode === 'PRELOAD') return
+
+        try {
+            const resBody = await request({
+                path: '/api/profile/kanji',
+                method: 'DELETE',
+                body: [writing]
+            }) as IDefaultBodyResponse
+
+            if (resBody.message && resBody.applicableFor === 'alert') {
+                alerts.pushAlert({
+                    message: resBody.message,
+                    status: resBody.success ? 'success' : 'error'
+                })
+            }
+
+            props.setHasStateOfKanjiJustBeenChanged(false)
+
+            setIsCardAdded(false)
+
+            
+        } catch (error) {
+            alerts.pushAlert({
+                message: 'Произошла ошибка. Попробуйте позже',
+                status: 'error'
+            })
+        }
+    }
 
 
     return (
@@ -69,19 +105,14 @@ export function Card(props: CardProps) {
             <div 
                 className={`${style.card} ${mode === 'PRELOAD' ? 'blank' : ''}`}
             >
-                <span className={style.index}>{index ? index : '?'}</span>
+                <span className={style.sort}>{sort ? sort : '?'}</span>
+                {filter ? <span className={style.filter}>{filter}</span> : null}
                 <span className={`${style.kanji} ${ibm_plex_sans_jp.className}`}>{writing}</span>
                 <div className={`${style['btn-box']} ${session && mode === 'FILLED' ? '' : style.inactive}`}>
-                    {
-                        !isCardAdded ? 
-                            <button 
-                                className={`${style['kanji-btn']} ${style['add']}`}
-                                onClick={() => addKanji()}
-                            >Добавить</button> :
-                            <span 
-                                className={style['added-kanji-plug']}
-                            >Добавлен</span>
-                    }
+                    <button 
+                        onClick={() => isCardAdded ? removeKanji() : addKanji()}
+                        >{isCardAdded ? <Minus/> : <Plus/>}
+                    </button>
                 </div>
             </div>
         </div>

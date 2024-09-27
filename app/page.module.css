@@ -35,11 +35,11 @@
     color: #8e8693;
 }
 .text-block p, 
-.container p + ul,
+.container ul,
 .text-block table {
     margin-bottom: 15px;
 }
-.container p + ul {
+.container ul {
     list-style: none;
     padding-left: 10px;
 }

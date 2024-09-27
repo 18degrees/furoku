@@ -14,7 +14,7 @@ import { useRouter } from 'next/navigation'
 import { alegreya } from '../../fonts'
 import style from './page.module.css'
 import Link from 'next/link'
-import { level, sortMethod } from '@/app/interfaces/search.interface'
+import { filterMethod, level, sortMethod } from '@/app/interfaces/search.interface'
 
 interface IBody extends IDefaultBodyResponse {
     kanjis: ISearchKanji[]
@@ -41,6 +41,7 @@ export default function Page() {
 
     const [searchText, setSearchText] = useState<text>(getTextInitial)
 
+    const [filterMethod, setFilterMethod] = useState<filterMethod>(getInitialFilterMethod)
     const [sortMethod, setSortMethod] = useState<sortMethod>(getInitialSortMethod)
 
     const page = useRef<page>(getPageInitial())
@@ -49,7 +50,7 @@ export default function Page() {
     const pagesAmount = useRef<page | ''>('')
 
     const [cards, setCards] = useState<JSX.Element[] | null>(() => putBlankCards())
-    const [hasCardJustBeenAdded, setHasCardJustBeenAdded] = useState<boolean>(false)
+    const [hasStateOfKanjiJustBeenChanged, setHasStateOfKanjiJustBeenChanged] = useState<boolean>(false)
         
     const [leftCoord, setLeftCoord] = useState(0)
 
@@ -57,15 +58,18 @@ export default function Page() {
     
     let touchStartLeftCoord = 0;
 
-    function getInitialSortMethod(): sortMethod {
-        const method = params.get('by')
+    function getInitialFilterMethod(): filterMethod {
+        const method = params.get('filter')
 
         return (
-            method === 'jlpt'     || 
-            method === 'stroke'   || 
-            method === 'mainichi' || 
-            method === 'grade'    || 
-            method === 'wiki' ? method : 'jlpt'
+            method === 'jlpt' || method === 'grade' || method === '' ? method : ''
+        )
+    }
+    function getInitialSortMethod(): sortMethod {
+        const method = params.get('sort')
+
+        return (
+            method === 'stroke' || method === 'mainichi' || method === 'wiki' ? method : 'wiki'
         )
     }
     function getTextInitial(): text {
@@ -169,12 +173,30 @@ export default function Page() {
 
     }, [searchText, router])
     
+    function onFilterMethodChange(method: filterMethod) {
+        setFilterMethod(method)
+
+        const pathToModify = new URL(window.location.href)
+
+        method === '' ? pathToModify.searchParams.delete('filter') : pathToModify.searchParams.set('filter', method)
+
+        if (page.current !== 1) {
+            pathToModify.searchParams.delete('page')
+            page.current = 1
+        }
+        if (level.current !== 'all') {
+            pathToModify.searchParams.delete('level')
+            level.current = 'all'
+        }
+
+        router.push(`${pathToModify.pathname}${pathToModify.search}`)
+    }
     function onSortMethodChange(method: sortMethod) {
         setSortMethod(method)
 
         const pathToModify = new URL(window.location.href)
 
-        method === 'jlpt' ? pathToModify.searchParams.delete('by') : pathToModify.searchParams.set('by', method)
+        method === 'wiki' ? pathToModify.searchParams.delete('sort') : pathToModify.searchParams.set('sort', method)
 
         if (page.current !== 1) {
             pathToModify.searchParams.delete('page')
@@ -213,7 +235,7 @@ export default function Page() {
         return blankCards
     }
 
-    const clearAddStatus = () => setHasCardJustBeenAdded(false)
+    const clearAddStatus = () => setHasStateOfKanjiJustBeenChanged(false)
         
     useEffect(() => {
         clearAddStatus()
@@ -232,7 +254,7 @@ export default function Page() {
                             writing={kanjiInfo.writing}  
                             key={kanjiInfo.id} 
                             isCardAdded={kanjiInfo.added}
-                            setHasCardJustBeenAdded={setHasCardJustBeenAdded}
+                            setHasStateOfKanjiJustBeenChanged={setHasStateOfKanjiJustBeenChanged}
                         />
                     )
                 }))
@@ -283,7 +305,7 @@ export default function Page() {
         }
 
         getCards()
-    }, [params, hasCardJustBeenAdded, alerts, changePage, request])
+    }, [params, hasStateOfKanjiJustBeenChanged, alerts, changePage, request])
 
     function isPageCorrect(consideredPage: number) {
         if (consideredPage <= 0) return false
@@ -369,9 +391,128 @@ export default function Page() {
         <div className={`${style.container}`}>
             {isLoadingProcessing ? <div className={style.spinner}><Spinner size={50}/></div> : null}
             <h1 className={alegreya.className}>Список иероглифов</h1>
-            <p className={style.description}>Здесь вы найдёте доступные к повторению иероглифы. Для упрощения поиска используйте сортировку по разным категориям или введите напрямую с помощью поисковой строки</p>
-            <div className={style['sort-block']}>
+            <p className={style.description}>Здесь вы найдёте доступные к повторению иероглифы. Для упрощения поиска используйте фильтрацию и сортировку по разным категориям или введите напрямую с помощью поисковой строки.</p>
+            {/* <div className={style['sort-block']}> */}
+            <div className={style.settings}>
+                <div className={style.filter}>
+                    <p>Фильтрация</p>
+                    <div className={style.radios}>
+                        <label>Отсутствует
+                            <input 
+                                type='radio' 
+                                name='filter' 
+                                value='' 
+                                defaultChecked={filterMethod === ''} 
+                                onChange={() => onFilterMethodChange('')}
+                                />
+                        </label>
+                        <label>JLPT
+                            <input 
+                                type='radio' 
+                                name='filter' 
+                                value='jlpt' 
+                                defaultChecked={filterMethod === 'jlpt'} 
+                                onChange={() => onFilterMethodChange('jlpt')}
+                                />
+                        </label>
+                        <label>Классу похождения
+                            <input 
+                                type='radio' 
+                                name='filter' 
+                                value='grade' 
+                                defaultChecked={filterMethod === 'grade'} 
+                                onChange={() => onFilterMethodChange('grade')}
+                                />
+                        </label>
+                    </div>
+                    {
+                        filterMethod === 'jlpt' ? <select 
+                            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => changeLevel(event.target.value as level)}
+                            value={level.current}
+                            disabled={!!searchText}
+                            >
+                            <option value='all'>Все</option>
+                            <option value='5'>N5</option>
+                            <option value='4'>N4</option>
+                            <option value='3'>N3</option>
+                            <option value='2'>N2</option>
+                            <option value='1'>N1</option>
+                        </select> : filterMethod === 'grade' ? <select 
+                            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => changeLevel(event.target.value as level)}
+                            value={level.current}
+                            disabled={!!searchText}
+                            >
+                            <option value='all'>Все</option>
+                            <option value='1'>Класс 1</option>
+                            <option value='2'>Класс 2</option>
+                            <option value='3'>Класс 3</option>
+                            <option value='4'>Класс 4</option>
+                            <option value='5'>Класс 5</option>
+                            <option value='6'>Класс 6</option>
+                            <option value='7'>Класс 7</option>
+                            <option value='8'>Класс 8</option>
+                            <option value='9'>Класс 9</option>
+                        </select> : <select 
+                            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => changeLevel(event.target.value as level)}
+                            value={level.current}
+                            disabled={true}
+                            >
+                            <option value='all'>Все</option>
+                        </select>
+                    }
+                </div>
+                <div className={style.sort}>
+                    <p>Сортировка по</p>
+                    <div className={style.radios}>
+                        <label>Частоте в вики
+                            <input 
+                                type='radio' 
+                                name='sort' 
+                                value='wiki' 
+                                defaultChecked={sortMethod === 'wiki'} 
+                                onChange={() => onSortMethodChange('wiki')}
+                                />
+                        </label>
+                        <label>Частоте в газете &quot;Маинити&quot;
+                            <input 
+                                type='radio' 
+                                name='sort' 
+                                value='mainichi' 
+                                defaultChecked={sortMethod === 'mainichi'} 
+                                onChange={() => onSortMethodChange('mainichi')}
+                                />
+                        </label>
+                        <label>Количеству черт
+                            <input 
+                                type='radio' 
+                                name='sort' 
+                                value='stroke' 
+                                defaultChecked={sortMethod === 'stroke'} 
+                                onChange={() => onSortMethodChange('stroke')}
+                                />
+                        </label>
+                    </div>
+                </div>
                 <div>
+                    <input 
+                        type='text'
+                        onChange={(event) => setSearchText(event.target.value)}
+                        value={searchText}
+                        spellCheck={false}
+                        placeholder='Поиск'
+                    />
+                    <div className={style['checkbox-container']}>
+                        <input 
+                            type='checkbox' 
+                            id='learning-include'
+                            onChange={event => changeIncludeLearnt(event.target.checked)}
+                            checked={includeLearnt.current}
+                            disabled={!session}
+                        ></input>
+                        <label htmlFor='learning-include'>Показать изучаемые</label>
+                    </div>
+                </div>
+                {/* <div>
                     <p>Отобразить по</p>
                     <div className={style.radios}>
                         <label>JLPT
@@ -483,7 +624,7 @@ export default function Page() {
                         ></input>
                         <label htmlFor='learning-include'>Показать изучаемые</label>
                     </div>
-                </div>
+                </div> */}
             </div>
             {!session ? 
                 <div className={style.alert}>

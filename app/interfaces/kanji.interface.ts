@@ -7,7 +7,10 @@ export type pointsOf = kanjiProps | 'total'
 export interface ISearchKanji {
     id: string
     writing: string
-    index: string
+    index: {
+        filter?: number
+        sort?: number
+    }
     added: boolean
 }
 export interface IKanjiWithPointsBrief {
