@@ -357,9 +357,17 @@ function makeFrequencyRelative(kanjis: ISearchKanji[]): ISearchKanji[] {
     })
 }
 function sortKanjis(kanjis: ISearchKanji[], descending: boolean) {
-    return kanjis.sort((a, b) => {
+    const kanjisWithSortUndefiend: ISearchKanji[] = []
+    const kanjisWithKnownSort: ISearchKanji[] = []
+
+    for (const kanjiObj of kanjis) {
+        kanjiObj.index.sort ? kanjisWithKnownSort.push(kanjiObj) : kanjisWithSortUndefiend.push(kanjiObj)
+    }
+    kanjisWithKnownSort.sort((a, b) => {
         if (!b.index.sort || !a.index.sort) return 0
 
         return descending ? b.index.sort - a.index.sort : a.index.sort - b.index.sort
     })
+
+    return [...kanjisWithKnownSort, ...kanjisWithSortUndefiend]
 }
