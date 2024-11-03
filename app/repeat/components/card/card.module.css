@@ -1,0 +1,60 @@
+.card {
+    background-color: #f7e9f8;
+    padding: 30px 20px 20px 20px;
+    width: 235px;
+    position: relative;
+    cursor: default;
+}
+.card button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    cursor: default;
+}
+.card h2 {
+    display: flex;
+    justify-content: space-between;
+}
+.card h2, .card p {
+    font-size: 20px;
+}
+.card h2:last-of-type {
+    margin-top: 10px;
+}
+.card p {
+    color: #555555;
+    user-select: text;
+}
+.card hr {
+    width: 100px;
+    background-color: #555555;
+    margin: 3px 0 5px 0;
+}
+.card .reading p {
+    word-spacing: 9999999px;
+}
+.card div.writing p:last-child {
+    text-align: center;
+    font-size: 100px;
+}
+.card div h2 + div {
+    height: 0;
+    overflow: hidden;
+}
+.card div.active h2 + div {
+    height: fit-content;
+}
+.card div.active h2 span {
+    transform: rotate(180deg) translateY(-5px);
+}
+.card div.reading {
+    word-spacing: 5px;
+}
+.card div.reading i:first-of-type {
+    padding-bottom: 5px;
+    display: block;
+}
+.card div i {
+    word-spacing: normal;
+    font-size: 18px;
+}

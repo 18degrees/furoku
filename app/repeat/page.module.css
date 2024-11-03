@@ -1,9 +1,8 @@
 .container {
-    width: 60%;
+    width: 80%;
     margin: auto;
-    max-width: 1200px;
-    min-height: Calc(100vh - 60px);
-}
+    padding: 40px 0
+ }
 .spinner {
     position: absolute;
     right: 15px;
@@ -11,7 +10,7 @@
 }
 
 .sort-container {
-    margin: 40px auto 30px auto;
+    margin: 0 auto 40px auto;
     display: flex;
     width: fit-content;
     font-size: 17px;
@@ -65,184 +64,15 @@
     background-color: #f2e7f2;
 }
 
-.primary-block, .kanjis, .words {
-    max-width: 720px;
-}
-.primary-block {
-    margin: auto;
-}
-.direction {
-    width: fit-content;
-    margin-left: auto;
-}
-.direction button {
-    width: 60px;
-    height: 30px;
-    background-color: #F6E6F4;
-    border: 1px solid #C6AEC6;
-}
-.direction .prev {
-    margin-right: 10px;
-}
-.direction .prev svg {
-    transform: rotate(180deg);
-}
-.direction button:disabled {
-    border: 1px solid #E3D1E3;
-}
-
-.kanji-block {
-    margin: 5px 0 5px 0;
-    padding: 40px 30px 50px 30px;
-    background-color: #F6E6F4;
-    border: 1px solid #C6AEC6;
-    display: grid;
-    grid-template-areas: 
-        "A A  B"
-        "A A  B"
-        "A A  C";
+.cards {
     justify-items: center;
-    user-select: text;
-}
-.kanji-block h2 {
-    user-select: none;
-    text-align: center;
-    color:#604f5e
-}
-.writing {
-    grid-area: A;
-    text-align: center;
-}
-.reading {
-    grid-area: B;
-}
-.meaning {
-    grid-area: C;
-}
-.writing p,
-.reading > div,
-.meaning p {
-    color: transparent;
-}
-.writing p {
-    transform: translateY(25px);
-}
-.reading > div {
-    min-height: 150px;
-}
-.meaning p {
-    min-height: 80px;
-}
-.writing .active,
-.reading .active,
-.meaning .active {
-    color: #604f5e;
-}
-.reading h2,
-.meaning h2 {
-    margin-bottom: 10px;
-}
-.meaning p, .reading p {
-    width: 250px;
-}
-.writing p {
-    font-size: 160px;
-}
-.reading p {
-    font-size: 19px;
-}
-.meaning p {
-    font-size: 20px;
-}
-.reading {
-    margin-bottom: 30px;
-}
-.reading > div > div:first-of-type {
-    margin-bottom: 15px;
 }
 
-.interaction {
-    display: flex;
-    justify-content: space-between;
-}
-.interaction button {
-    font-size: 22px;
-    background-color: #F6E6F4;
-    width: 40px;
-    height: 40px;
-    padding-top: 5px;
-}
-.interaction > div button {
-    margin-right: 10px;
-    border: 1px solid #b0b0b0
-}
-.remove {
-    border: 1px solid #A2808D
-}
-.interaction button.transparent {
-    opacity: .3
-}
-
-.kanjis, .non-kanji-plug, .words {
-    margin: 50px auto 60px auto;
-}
-.kanjis, .words {
-    color: #8E7C8E;
-}
-.kanjis {
-    font-size: 70px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 140px);
-    column-gap: 20px;
-    row-gap: 20px;
-    justify-content: center;
-}
-.words {
-    font-size: 24px;
-}
-
-.kanjis p {
-    text-align: center;
-}
-.words p {
-    display: block;
-    width: 100%;
-    padding: 5px;
-    margin-bottom: 15px;
-}
-.current {
-    background-color: #F6E6F4;
-}
-.non-kanji-plug {
-    text-align: center;
-    font-size: 21px;
-    color: #544555
-}
-
-@media screen and (max-width: 1050px) {
-    .container {
-        width: 80%
-    }
+@media screen and (max-width: 730px) {
     .sort-container {
         display: block;
     }
     .sort-container > div:first-of-type {
         margin: 0 0 40px 0;
-    }
-    .direction {
-        margin: auto;
-    }
-    .kanji-block {
-        display: block;
-    }
-    .meaning p, .reading p {
-        width: fit-content;
-    }
-    .writing p {
-        font-size: 100px;
-        transform: translateY(0);
-    }
-    .meaning p {
-        min-height: auto;
     }
 }
