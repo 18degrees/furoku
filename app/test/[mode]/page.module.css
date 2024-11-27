@@ -6,7 +6,7 @@
     flex-direction: column;
     justify-content: space-around;
     min-height: 500px;
-    background-color: #FAECFC;
+    background-color: #fffaff;
     position: relative;
     width: 80%;
     max-width: 700px;
@@ -25,7 +25,7 @@
 }
 .writing-block {
     padding: 30px;
-    background-color: #F5E4F4;
+    background-color: #fcf5fc;
     width: 320px;
     text-align: center;
     margin: auto;

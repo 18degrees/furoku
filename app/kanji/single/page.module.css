@@ -25,8 +25,8 @@
     text-align: center;
 }
 .settings {
-    background-color: #F1E4F2;
-    box-shadow: 0px 2px 4px rgba(100,100,100,0.5);
+    box-shadow: 0px 2px 4px rgb(182 182 182 / 50%);
+    background-color: #fff9f9;
     padding: 60px 20px;
     margin-bottom: 40px;
     color: #6b616b
@@ -58,8 +58,10 @@
 .settings select {
     padding: 10px 14px;
     font-size: 17px;
-    border: 1px solid #d4d4d4;
-    background-color: #FFF5FE;
+    /* border: 1px solid #d4d4d4;
+    background-color: #FFF5FE; */
+    border: 1px solid #dadada;
+    background-color: #fffcff;
 }
 .settings select {
     width: 132px;
@@ -76,7 +78,7 @@
 .alert p {
     border-radius: 10px;
     padding: 10px 15px;
-    background-color: #e7d1e8;
+    background-color: #f3e9f4;
     color: #4b414c;
 }
 .page-choice-box {
@@ -90,12 +92,14 @@
     padding: 5px;
     width: 125px;
     height: 40px;
-    background-color: #F4E4F5;
-    box-shadow: 0px 2px 4px rgba(100,100,100,0.5);
+    /* background-color: #F4E4F5; */
+    background-color: #faf1fa;
+    /* box-shadow: 0px 2px 4px rgba(100,100,100,0.5); */
+    box-shadow: 0px 1px 2px rgb(186 160 188 / 50%);
     border-radius: 8px;
 }
 .page-choice-box button:disabled {
-    background-color: #F4E4F5;
+    /* background-color: #F4E4F5; */
 }
 .page-choice-box > button:first-child {
     margin-right: 50px;

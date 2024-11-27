@@ -25,7 +25,8 @@
     margin-top: 5px;
     padding: 8px 12px;
     width: 160px;
-    background-color: #FFF2FF;
+    background-color: #fff8ff;
+    border: 1px solid #f1e6f1;
     display: flex;
     justify-content: space-between;
 }
@@ -35,7 +36,8 @@
 .sort-container ul {
     list-style: none;
     padding: 0 8px;
-    background-color: #FFF2FF;
+    background-color: #fff8ff;
+    border: 1px solid #f1e6f1;
     color: #232323;
     position: absolute;
     top: 61px;
@@ -61,7 +63,7 @@
     margin-top: 0;
 }
 .sort-container ul li.active {
-    background-color: #f2e7f2;
+    background-color: #f4ebf5;
 }
 
 .cards {

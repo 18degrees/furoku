@@ -2,12 +2,12 @@
     min-height: calc(100vh - 156px);
 }
 .content {
-    box-shadow: 0px 2px 4px rgba(100,100,100,0.5);
     margin: 5vh auto 0;
     width: fit-content;
     padding: 40px 180px;
     position: relative;
-    background-color: #EFE0EC;
+    background-color: #fffbff;
+    box-shadow: 0px 2px 4px rgb(182 182 182 / 50%);
 }
 .spinner {
     position: absolute;
@@ -18,7 +18,7 @@
     margin: 0 auto 20px auto;
     width: fit-content;
     text-align: center;
-    color: #a691a7;
+    color: #887c88;
 }
 .interactive {
     width: 400px;
@@ -41,14 +41,14 @@
 }
 .inputs-box label {
     color: #625560;
-    font-size: 18px;
+    font-size: 17px;
     margin-bottom: 5px;
 }
 .inputs-box input {
-    font-size: 18px;
+    font-size: 17px;
     padding: 10px 15px;
-    background-color: #F8F3F7;
-    color: #454046;
+    background-color: #f4edf2;
+    color: rgb(95 92 96);
     border: 1px solid transparent;
 }
 .inputs-box input:invalid {
@@ -57,39 +57,32 @@
 .inputs-box input::placeholder {
     color:#9b9b9b
 }
-.email-container {
-    display: flex;
+.email-container input, 
+.code-container input,
+.wrong-code-message, .remaining {
+    color: #454046;
 }
-.email-container input {
-    width: calc(100% - 50px)
+.email-container input, 
+.code-container input {
+    width: 100%;
+    margin-bottom: 5px;
+}
+.email-container button, 
+.code-container button {
+    text-decoration: underline;
+    color: #625560;
+}
+.email-container button:disabled, 
+.code-container button:disabled {
+    color: #8f8f8f
 }
 .code-container {
     display: none;
     margin-top: 20px;
 }
-.code-container input {
-    width: calc(100% - 50px)
-}
-.code-container input::placeholder {
-    letter-spacing: normal;
-}
-.envelope-btn, .confirm-btn {
-    width: 50px;
-    height: 42px;
-    background-color: #F8F3F7;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-left: 2px solid #EFE0EC;
-    position: relative;
-}
-.code-container button {
-    width: 50px;
-    font-size: 18px;
-}
+
 .wrong-code-message, .remaining {
     margin-top: 5px;
-    font-size: 17px;
 }
 .wrong-code-message {
     color: #8f6060;
@@ -112,11 +105,11 @@
     font-size: 18px;
     border-radius: 5px;
     width: 250px;
-    background-color: #9E8AA1;
+    background-color: #9d919f;
     color: white
 }
 .reg-btn:disabled {
-    background-color: #bca9be;
+    background-color: #c3bdc4;
 }
 
 @media screen and (max-width: 760px) {

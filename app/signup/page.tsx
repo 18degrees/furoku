@@ -6,14 +6,11 @@ import { EMAIL_PATTERN, PASSWORD_LENGTH } from "../patterns/auth"
 import { useContext, useEffect, useState, useRef } from "react"
 import { Spinner } from "../components/spinner/Spinner"
 import { signIn, useSession } from 'next-auth/react'
-import { Envelope } from "./components/Envelope-icon"
 import { useHttp } from "../hooks/http.hook"
 import { useRouter } from "next/navigation"
 import style from './page.module.css'
 import { alegreya } from "../fonts"
 import Link from "next/link"
-import { Check } from "./components/Check-icon"
-import { Arrow } from "./components/Arrow-icon"
 
 const SEND_CODE_COOLDOWN_SEC = 59
 
@@ -208,9 +205,7 @@ export default function Signup() {
                     </Link>
                     <div className={style['inputs-box']}>
                         <div className={style['credentials']}>
-                            <label htmlFor='email'>Почта<br/>
-                                <span className={style.detail}>(когда введёте, нажмите на конверт)</span>
-                            </label>
+                            <label htmlFor='email'>Почта</label>
                             <div className={style['email-container']}>
                                 <input 
                                     type="email" 
@@ -223,13 +218,12 @@ export default function Signup() {
                                     value={email}
                                     readOnly={isEmailConfirmed}
                                     onInput={(event: React.ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
-                                ></input>
-                                <button 
-                                    className={style['envelope-btn']}
+                                />
+                                <button
                                     onClick={sendCode}
                                     disabled={!email || !email.match(EMAIL_PATTERN) || secondsToSendCodeRemaining || isEmailConfirmed ? true : false}
-                                    >
-                                    <Envelope/>
+                                >
+                                    Отправить код подтверждения
                                 </button>
                             </div>
                             {/* <div className={style['error-box']}>
@@ -237,6 +231,9 @@ export default function Signup() {
                                     hidden={email && !email.match(EMAIL_PATTERN) ? false : true}
                                     >Почта введена в неверном формате</span>
                             </div> */}
+                            {isCodeSent.current && secondsToSendCodeRemaining && !isEmailConfirmed ? 
+                                <p className={style.remaining}>Повторить попытку можно через {secondsToSendCodeRemaining} с</p> 
+                            : null}
                             <div className={`${style['code-container']} code-container`}>
                                 <input 
                                     type="text" 
@@ -250,17 +247,14 @@ export default function Signup() {
                                     readOnly={isEmailConfirmed}
                                     onInput={(event: React.ChangeEvent<HTMLInputElement>) => onCodeChange(event.target.value)}
                                 />
-                                <button 
-                                    className={style['confirm-btn']}
+                                <button
+                                    onClick={checkEmailValidity}
                                     disabled={code.length != 5 || isEmailConfirmed ? true : false}
-                                    onClick={checkEmailValidity}>
-                                    {isEmailConfirmed ? <Check/> : <Arrow/>}
+                                >
+                                    {isEmailConfirmed ? 'Подтверждено' : 'Подтвердить'}
                                 </button>
                             </div>
                             <p className={style['wrong-code-message']}>{wrongCodeMessage}</p>
-                            {isCodeSent.current && secondsToSendCodeRemaining && !isEmailConfirmed ? 
-                                <p className={style.remaining}>Отправить код повторно можно через {secondsToSendCodeRemaining} с</p> 
-                            : null}
                         </div>
                         <div className={style['credentials']}>
                             <label htmlFor='password'>Пароль</label>
@@ -309,7 +303,7 @@ export default function Signup() {
             <style jsx>{`
                 ${isCodeSent.current ? 
                     `.code-container {
-                        display: flex
+                        display: block
                     }` : null}
                 }
                 ${password && secondPassword && password !== secondPassword ? 

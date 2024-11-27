@@ -2,12 +2,12 @@
     min-height: calc(100vh - 156px);
 }
 .content {
-    box-shadow: 0px 2px 4px rgba(100,100,100,0.5);
     margin: 5vh auto 0;
     width: fit-content;
     padding: 40px 180px;
     position: relative;
-    background-color: #EFE0EC;
+    background-color: #fffbff;
+    box-shadow: 0px 2px 4px rgb(182 182 182 / 50%);
 }
 .spinner {
     position: absolute;
@@ -18,7 +18,7 @@
     margin: 0 auto 20px auto;
     width: fit-content;
     text-align: center;
-    color: #a691a7;
+    color: #887c88;
 }
 .interactive {
     width: 400px;
@@ -41,14 +41,14 @@
 }
 .inputs-box label {
     color: #656565;
-    font-size: 18px;
+    font-size: 17px;
     margin-bottom: 5px;
 }
 .inputs-box input {
-    font-size: 18px;
+    font-size: 17px;
     padding: 10px 15px;
-    background-color: #F8F3F7;
-    color: #454046;
+    background-color: #f4edf2;
+    color: rgb(95 92 96);
     border: 1px solid transparent;
 }
 .inputs-box input::placeholder {
@@ -57,7 +57,7 @@
 .container button {
     display: block;
     margin: auto;
-    background-color: #8F7592;
+    background-color: #9d919f;
     color: white;
     padding: 15px;
     font-size: 18px;
@@ -65,7 +65,7 @@
     width: 250px;
 }
 .container button:disabled {
-    background-color: #9E8AA1;
+    background-color: #c3bdc4;
 }
 
 @media screen and (max-width: 760px) {

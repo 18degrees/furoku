@@ -3,19 +3,19 @@
     max-width: 1200px;
     margin: 40px auto;
     user-select: text;
-    background-color: #f1e4f3;
+    /* background-color: #f1e4f3; */
     padding: 40px 5%;
 }
 .header-block {
     margin: 30px auto 60px auto;
     display: flex;
     align-items: center;
-    max-width: 800px
+    /* max-width: 800px */
 }
 .header-block > span {
     user-select: none;
     font-size: 70px;
-    color: #F1E4F3;
+    color: rgb(255 250 255);
     writing-mode: tb-rl;
     letter-spacing: 30px;
     display: block;
@@ -26,31 +26,29 @@
     border-radius: 10px;
 }
 .header-block h1 {
-    color: #7c6778;
+    color: #645f66;
     max-width: 200px;
     z-index: 10;
 }
 .container h2 {
-    font-size: 30px;
-    color: #8e8693;
+    font-size: 28px;
+    color: #645f66;
 }
 .text-block p, 
 .container ul,
 .text-block table {
     margin-bottom: 15px;
 }
-.container ul {
-    list-style: none;
-    padding-left: 10px;
-}
 .container h3 {
     font-size: 23px;
 }
+.container h4 {
+    font-size: 22px
+}
 .text-content {
     margin: auto;
-    max-width: 800px;
-    font-size: 21px;
-    color: #6e6872
+    font-size: 20px;
+    color: #504955
 }
 .text-block {
     margin-bottom: 50px;
@@ -90,7 +88,7 @@
         font-size: 60px
     }
     .header-block h1 {
-    font-size: 30px;
+        font-size: 30px;
     }
     .text-content {
         font-size: 18px
@@ -99,7 +97,10 @@
         font-size: 25px;
     }
     .container h3 {
-        font-size: 20px;
+        font-size: 21px;
+    }
+    .container h4 {
+        font-size: 19px
     }
 }
 @media screen and (max-width: 500px) {

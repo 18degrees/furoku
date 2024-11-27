@@ -4,8 +4,8 @@ export function CloseIcon() {
             <g id="Group">
                 <path d="M0 0L28 0L28 28L0 28L0 0Z" id="Rectangle" fill="#000000" fillOpacity="0" fillRule="evenodd" stroke="none"/>
                 <g id="Group" transform="translate(3 3)">
-                    <path d="M0 22L22.3604 0" id="Path" fill="none" fillRule="evenodd" stroke="#EDDCEC" strokeWidth="4" strokeLinecap="square"/>
-                    <path d="M0.0361328 0.0114015L22.3164 21.9055" id="Path" fill="none" fillRule="evenodd" stroke="#EDDCEC" strokeWidth="4" strokeLinecap="square"/>
+                    <path d="M0 22L22.3604 0" id="Path" fill="none" fillRule="evenodd" stroke="rgb(255 250 255)" strokeWidth="4" strokeLinecap="square"/>
+                    <path d="M0.0361328 0.0114015L22.3164 21.9055" id="Path" fill="none" fillRule="evenodd" stroke="rgb(255 250 255)" strokeWidth="4" strokeLinecap="square"/>
                 </g>
             </g>
         </svg>

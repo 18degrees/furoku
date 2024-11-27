@@ -3,7 +3,7 @@
   box-sizing: border-box;
 }
 ::selection {
-  background-color: rgb(234 217 236);
+  background-color: rgb(229 225 230);
 }
 select::-ms-expand {
   display: none;
@@ -12,7 +12,7 @@ html, body {
   overflow-x: hidden;
 }
 html {
-  background-color: #EDDCEC;
+  background-color: rgb(255 250 255);
   min-width: 320px;
   user-select: none;
 }

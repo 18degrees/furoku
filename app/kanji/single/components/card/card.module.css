@@ -1,5 +1,6 @@
 .card {
-    background-color: #F4E4F5;
+    /* background-color: #F4E4F5; */
+    background-color: #fff8ff;
     position: relative;
     display: flex;
     justify-content: center;
@@ -7,7 +8,7 @@
     width: 225px;
     height: 280px;
     border-radius: 10px;
-    border: 1px solid #E3D1E5;
+    border: 1px solid #f1e6f1;
 }
 .sort, .filter {
     padding: 8px 10px;
@@ -36,7 +37,8 @@
     top: unset;
     bottom: 0px;
     right: 15px;
-    color: #d5c4da;
+    /* color: #d5c4da; */
+    color: #d8d0da;
 }
 .card::selection {
     background-color: white;
@@ -53,7 +55,7 @@
     left: 0;
     right: 0;
     z-index: 10;
-    background-color: rgb(181 156 183 / 30%);
+    background-color: rgb(216 207 216 / 30%);
     opacity: 0;
     transition: opacity 1s ease;
     border-radius: 5px;
@@ -71,7 +73,7 @@
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    background-color: #FFF2FE;
+    background-color: #fff8ff;
     display: flex;
     justify-content: center;
     align-items: center;
