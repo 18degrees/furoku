@@ -4,7 +4,7 @@
     max-width: 1200px;
     min-height: Calc(100vh - 85px);
     position: relative;
-    font-size: 18px;
+    font-size: 17px;
 }
 .spinner {
     position: fixed;
@@ -25,11 +25,12 @@
     text-align: center;
 }
 .settings {
-    box-shadow: 0px 2px 4px rgb(182 182 182 / 50%);
-    background-color: #fff9f9;
+    background-color: #fff8ff;
+    border: 1px solid #f1e6f1;
     padding: 60px 20px;
     margin-bottom: 40px;
-    color: #6b616b
+    color: #6b616b;
+    
 }
 .settings .filter,
 .settings .sort {
@@ -58,8 +59,6 @@
 .settings select {
     padding: 10px 14px;
     font-size: 17px;
-    /* border: 1px solid #d4d4d4;
-    background-color: #FFF5FE; */
     border: 1px solid #dadada;
     background-color: #fffcff;
 }
@@ -92,14 +91,9 @@
     padding: 5px;
     width: 125px;
     height: 40px;
-    /* background-color: #F4E4F5; */
     background-color: #faf1fa;
-    /* box-shadow: 0px 2px 4px rgba(100,100,100,0.5); */
-    box-shadow: 0px 1px 2px rgb(186 160 188 / 50%);
+    border: 1px solid #e0d8e0;
     border-radius: 8px;
-}
-.page-choice-box button:disabled {
-    /* background-color: #F4E4F5; */
 }
 .page-choice-box > button:first-child {
     margin-right: 50px;
@@ -166,8 +160,4 @@
     .description {
         width: 100%;
     }
-    /* .settings input[type=text],
-    .settings select {
-        width: 100%
-    } */
 }
