@@ -20,23 +20,11 @@ const WELL_POINTS = 2
 const MEDIUM_POINTS = 1
 const BAD_POINTS = -2
 
-const TIME_IMPORTANCE = 0.5
-
 interface IKanjiView {
     writing: string
     points: number
     test_timestamp: number
 }
-// interface IKnownWritingView {
-//     id: string;
-//     key: string;
-//     value: {
-//         writing: string
-//         points: number
-//         test_timestamp: number
-//     };
-//     doc?: nano.Document | undefined;
-// }
 
 interface IKanjiWithPoints {
     writing: string
@@ -133,7 +121,7 @@ function getReadyToTestKanjis(kanjis: IKanjiView[]): IKanjiView[] | null {
     return readyToTest
 }
 async function getNeededKanjis(kanjis: IKanjiView[], mode: modeType): Promise<ITestKanji[]> {
-    const kanjisTimeConsidered = getKanjisWithTimeConsideredPoints(kanjis)
+    const kanjisTimeConsidered = await getKanjisWithComplexPoints(kanjis)
 
     sortByPoints(kanjisTimeConsidered)
 
@@ -178,18 +166,41 @@ async function getNeededKanjis(kanjis: IKanjiView[], mode: modeType): Promise<IT
     }
 
 }
-function getKanjisWithTimeConsideredPoints(kanjis: IKanjiView[]): IKanjiWithPoints[] {
-    return kanjis.map(kanji => {
-        const testedDaysAgo = Math.trunc((Date.now() - kanji.test_timestamp) / (1000 * 60 * 60 * 24))
+async function getKanjisWithComplexPoints(kanjis: IKanjiView[]): Promise<IKanjiWithPoints[]> {
+    const nanoServer = nano(DB_URI)
+    const kanjiDB: nano.DocumentScope<IDBKanji> = nanoServer.db.use('kanji')
+
+    const updKanjis = Promise.all(kanjis.map(async kanji => {
+        const testedDaysAgo = (Date.now() - kanji.test_timestamp) / (1000 * 60 * 60 * 24)
+        const daysPenalty = Math.trunc(testedDaysAgo)
+
         const points = kanji.points
 
-        const pointsTimeConsidered = points - (testedDaysAgo * TIME_IMPORTANCE)
+        const frequency = await getWikiFrequency(kanji.writing) ?? 0.01
+    
+        const frequencyMultiplier = frequency <= 0.01 ? 500 : frequency <= 0.1 ? 80 : frequency <= 1 ? 10 : frequency <= 4 ? 5 : 2
+    
+        const frequencyPenalty = Math.random() * frequencyMultiplier * frequency        //вносим случайность, основанную на частоте, для иммитации естественного подбора
+    
+        const correctPoints = points - frequencyPenalty - daysPenalty
 
         return {
             writing: kanji.writing,
-            points: pointsTimeConsidered
+            points: correctPoints
         }
-    })
+    }))
+
+    return updKanjis
+
+    async function getWikiFrequency(writing: string): Promise<number | undefined> {
+        try {
+            const kanjiObj = await kanjiDB.get(writing)
+    
+            return kanjiObj.frequencies.wikipedia?.total
+        } catch (error) {
+            return undefined
+        }
+    }
 }
 function sortByPoints(kanjis: IKanjiWithPoints[]) {
     kanjis.sort((kanji_1, kanji_2) => kanji_1.points - kanji_2.points)
