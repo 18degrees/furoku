@@ -18,7 +18,6 @@ const MIN_KNOWLEDGE_POINTS = 0
 
 const WELL_POINTS = 2
 const MEDIUM_POINTS = 1
-const BAD_POINTS = -2
 
 interface IKanjiView {
     writing: string
@@ -453,7 +452,7 @@ function getPoints({kanjiObj, answer, known, knowledgeOf}: IGetPointsProps): IPo
         case "bad": 
             updExtraPoints = prevExtra > 0 ? 0 : prevExtra - EXTRA_POINT             //если ответ плохой, то сбрасываются доп. очки (если они были)
 
-            updPoints = prevPoints + BAD_POINTS + (prevExtra > 0 ? 0 : prevExtra)    //при остальных ответах учитываются доп. очки за прошлые тестирования; здесь - учитываются обнулённые, если вышло больше 0
+            updPoints = prevExtra > 0 ? 0 : prevExtra                               //при остальных ответах учитываются доп. очки за прошлые тестирования; здесь - учитываются обнулённые, если вышло больше 0
             break
         case "medium":
             updExtraPoints = prevExtra < 1 ? prevExtra + EXTRA_POINT : 1            //при среднем ответе бонус не может быть больше 1
