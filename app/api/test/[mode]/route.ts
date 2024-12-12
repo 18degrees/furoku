@@ -6,6 +6,7 @@ import nano from "nano"
 import { IDBKanji, ITestKanji } from "@/app/interfaces/kanji.interface"
 
 const DB_URI = process.env.COUCHDB_URI!
+const PAGES_ANALYZED = +process.env.PAGES_ANALYZED!
 
 const TEST_COOLDOWN_TIME_MS = 1000 * 60 * 60 * 12                       //12 часов
 
@@ -194,8 +195,12 @@ async function getKanjisWithComplexPoints(kanjis: IKanjiView[]): Promise<IKanjiW
     async function getWikiFrequency(writing: string): Promise<number | undefined> {
         try {
             const kanjiObj = await kanjiDB.get(writing)
+
+            const absoluteFrequency = kanjiObj.frequencies.wikipedia?.total
+
+            const relativeFrequnecy = absoluteFrequency ? absoluteFrequency / PAGES_ANALYZED : undefined
     
-            return kanjiObj.frequencies.wikipedia?.total
+            return relativeFrequnecy
         } catch (error) {
             return undefined
         }
