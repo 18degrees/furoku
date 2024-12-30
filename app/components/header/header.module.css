@@ -22,7 +22,7 @@
     display: none;
 }
 .nav {
-    z-index: 100;
+    z-index: 1000;
     transition: transform .5s;
 }
 .nav .close {
