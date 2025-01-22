@@ -1,124 +1,29 @@
 .container > div {
-    width: 60%;
-    max-width: 1200px;
-    margin: 40px auto;
-    user-select: text;
-    /* background-color: #f1e4f3; */
-    padding: 40px 5%;
-}
-.header-block {
-    margin: 30px auto 60px auto;
-    display: flex;
-    align-items: center;
-    /* max-width: 800px */
-}
-.header-block > span {
-    user-select: none;
-    font-size: 70px;
-    color: rgb(255 250 255);
-    writing-mode: tb-rl;
-    letter-spacing: 30px;
-    display: block;
-    margin-right: 20px;
-    padding: 20px 30px 0 30px;
-    line-height: 50px;
-    background-color: #AA94A7;
-    border-radius: 10px;
-}
-.header-block h1 {
-    color: #645f66;
-    max-width: 200px;
-    z-index: 10;
-}
-.container h2 {
-    font-size: 28px;
-    color: #645f66;
-}
-.text-block p, 
-.container ul,
-.text-block table {
-    margin-bottom: 15px;
-}
-.container h3 {
-    font-size: 23px;
-}
-.container h4 {
-    font-size: 22px
-}
-.text-content {
+    width: 90%;
+    max-width: 750px;
     margin: auto;
-    font-size: 20px;
-    color: #504955
+    padding-bottom: 40px;
+    user-select: text;
 }
-.text-block {
-    margin-bottom: 50px;
+.first-view {
+    min-height: calc(100vh - 15vh - 60px);
+    width: 100%;
 }
-
-.text-block table {
+.first-view > div {
+    margin: 15vh auto 0;
     text-align: center;
-    border-collapse: collapse;
 }
-.text-block table th {
-    font-weight: 400;
-    padding: 0 20px;
-    border: 1px solid #6e6872
+.first-view p {
+    color: #7B6178;
 }
-.text-block table td {
-    border: 1px solid #6e6872;
-    padding: 5px 0;
-}
-.text-block li, .text-block li {
-    padding: 2px;
-}
-.text-block ol {
-    margin-top: 5px;
-    padding-left: 28px
-}
-.text-block ol li {
-    padding: 2px;
-}
+.first-view p:first-of-type {
+    font-size: 35px;
+    letter-spacing: 3px;
+    margin-bottom: unset;
 
-@media screen and (max-width: 1300px) {
-    .container > div {
-        width: 90%;
-    }
 }
-@media screen and (max-width: 850px) {
-    .header-block span {
-        font-size: 60px
-    }
-    .header-block h1 {
-        font-size: 30px;
-    }
-    .text-content {
-        font-size: 18px
-    }
-    .container h2 {
-        font-size: 25px;
-    }
-    .container h3 {
-        font-size: 21px;
-    }
-    .container h4 {
-        font-size: 19px
-    }
-}
-@media screen and (max-width: 500px) {
-    .header-block {
-        flex-direction: column;
-        justify-content: center;
-        margin-top: 0;
-    }
-    .header-block h1 {
-        text-align: center;
-    }
-    .header-block span {
-        text-align: center;
-        margin: 0 0 30px 0;
-        font-size: 30px;
-        writing-mode: unset;
-        padding: 0px 30px 5px 45px;
-        line-height: unset;
-        letter-spacing: 15px;
-    }
+.first-view p:last-of-type {
+    font-size: 27px;
+    letter-spacing: 5px;
+    margin-bottom: 15px;
 }
