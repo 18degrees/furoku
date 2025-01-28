@@ -23,7 +23,7 @@ export function Header() {
 
     return (
         <header className={`${style.header}`}>
-            <p className={`${style['site-name']} ${alegreya.className}`}>furoku</p>
+            <span className={`${shippori_mincho.className} ${style.logo}`}>ふ</span>
             <div>
                 <div 
                     className={style['pages-icon']}
