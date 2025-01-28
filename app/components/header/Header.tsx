@@ -58,9 +58,16 @@ export function Header() {
                             </li>
                             <li>
                                 <Link 
-                                    href={session ? '/test' : '/signin?callbackUrl=/test'}
+                                    href='/test'
                                     onClick={() => setIsNavOpened(false)}
                                     >Тестирование
+                                </Link>
+                            </li>
+                            <li>
+                                <Link 
+                                    href={session ? '/repeat' : '/signin?callbackUrl=/repeat'}
+                                    onClick={() => setIsNavOpened(false)}
+                                    >Повторение
                                 </Link>
                             </li>
                         </ul>
@@ -73,12 +80,7 @@ export function Header() {
                     <span className={`${shippori_mincho.className} ${style.user}`}>人</span>
                     <div className={style['menu-container']}>
                         <div className={style.menu}>
-                            <div className={style['unlocked-functions']}>
-                                <Link href='/repeat'>Повторение</Link>
-                            </div>
-                            <div className={style['exit-block']}>
-                                <span onClick={() => signOut()}>Выйти</span>
-                            </div>
+                            <span onClick={() => signOut()}>Выйти</span>
                         </div>
                     </div>
                 </>
@@ -113,6 +115,10 @@ export function Header() {
                                 }
                             ` : pathname === '/test' ? `
                                 .nav li:nth-of-type(3) {
+                                    background-color: #6e596d
+                                }
+                            ` : pathname === '/repeat' ? `
+                                .nav li:nth-of-type(4) {
                                     background-color: #6e596d
                                 }
                             ` : ''}

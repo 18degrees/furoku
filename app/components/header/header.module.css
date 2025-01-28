@@ -50,8 +50,10 @@
 .nav li {
     display: inline;
 }
-.nav li:first-of-type, .nav li:nth-child(2) {
-    margin-right: 70px;    
+.nav li:first-of-type, 
+.nav li:nth-child(2),
+.nav li:nth-child(3) {
+    margin-right: 50px;    
 }
 .nav a {
     color: #ffffff;
@@ -79,21 +81,17 @@
     padding-top: 10px;
 }
 .menu {
-    padding: 20px;
+    padding: 15px;
     background-color: #7B6178;
     position: relative;
     text-align: start;
     line-height: normal;
     z-index: 100;
     color: #ffffff;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 .menu span {
     cursor: pointer;
-}
-.exit-block {
-    margin-top: 10px;
-    padding-top: 10px;
 }
 
 .pages-icon {
@@ -107,7 +105,7 @@
     cursor: pointer;
 }
 
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 900px) {
     .logo {
         margin: auto;
     }
