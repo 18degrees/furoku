@@ -1,0 +1,46 @@
+.container {
+    margin: auto;
+    width: 80%;
+}
+.container > a {
+    text-decoration: none;
+    display: block;
+    margin: 40px auto;
+    min-width: 300px;
+    max-width: 500px;
+    padding: 17px 15px;
+    background-color: #FFF8FF;
+    border: 1px solid #F1E6F1;
+}
+.container > a label {
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: #A1859B;
+    cursor: pointer;
+}
+.preview {
+    margin-top: 15px;
+}
+.preview p {
+    opacity: .33;
+    color: #A1859B;
+    text-align: right;
+}
+
+.preview.single p, .preview.combo p {
+    font-size: 30px;
+}
+.preview.single {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    letter-spacing: -10px;
+    margin: 15px 0 0 auto;
+}
+.preview.combo {
+    line-height: 32px;
+    letter-spacing: 3px;
+}
+.preview.info p {
+    opacity: .6;
+    letter-spacing: 1px;
+}
