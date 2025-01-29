@@ -6,12 +6,7 @@ const nextConfig = {
                 source: '/about',
                 destination: '/',
                 permanent: true,
-            },
-            {
-                source: '/kanji',
-                destination: '/kanji/single',
-                permanent: true,
-            },
+            }
         ]
     } 
 }
