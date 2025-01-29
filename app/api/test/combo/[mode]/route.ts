@@ -1,9 +1,9 @@
-import { IUserDoc, usersKanji } from "@/app/interfaces/user.interface"
-import { UnreachablePathError, WrongPathError } from "../../errors"
-import getUser from "../../auxiliaries/getUser"
+import { IUserDoc, usersCombo, usersKanji } from "@/app/interfaces/user.interface"
+import { UnreachablePathError, WrongPathError } from "../../../errors"
+import getUser from "../../../auxiliaries/getUser"
 import { NextRequest } from "next/server"
 import nano from "nano"
-import { IDBKanji, ITestKanji } from "@/app/interfaces/kanji.interface"
+import { ITestCombo, IDBComboKanji } from "@/app/interfaces/combo-kanji.interface"
 
 const DB_URI = process.env.COUCHDB_URI!
 const PAGES_ANALYZED = +process.env.PAGES_ANALYZED!
@@ -20,14 +20,14 @@ const MIN_KNOWLEDGE_POINTS = 0
 const WELL_POINTS = 2
 const MEDIUM_POINTS = 1
 
-interface IKanjiView {
-    writing: string
+interface IComboView {
+    id: string
     points: number
     test_timestamp: number
 }
 
-interface IKanjiWithPoints {
-    writing: string
+interface IComboWithPoints {
+    id: string
     points: number
 }
 
@@ -48,29 +48,29 @@ export async function GET(req: NextRequest) {
             message: 'Пользователь не авторизован'
         }, {status: 403})
 
-        const kanjisView: nano.DocumentViewResponse<IKanjiView, IUserDoc> = await usersDB.view('for_test', mode, {key: user.email})
+        const combosView: nano.DocumentViewResponse<IComboView, IUserDoc> = await usersDB.view('for_test', 'combo_' + mode, {key: user.email})
 
-        const kanjisAmount = kanjisView.total_rows 
+        const combosAmount = combosView.total_rows 
 
-        if (kanjisAmount === 0) {
+        if (combosAmount === 0) {
             return Response.json({
-                kanjis: null
+                combos: null
             })
         }
 
-        const kanjis = kanjisView.rows.map(obj => obj.value)
+        const combos = combosView.rows.map(obj => obj.value)
 
-        const readyToTestKanjis = getReadyToTestKanjis(kanjis)
+        const readyToTestCombos = getReadyToTestCombos(combos)
 
-        if (!readyToTestKanjis) {
+        if (!readyToTestCombos) {
             return Response.json({
-                kanjis: null
+                combos: null
             })
         }
-        const preparedKanjis = await getNeededKanjis(readyToTestKanjis, mode)
+        const preparedCombos = await getNeededCombos(readyToTestCombos, mode)
 
         return Response.json({
-            kanjis: preparedKanjis
+            combos: preparedCombos
         })
     } catch (error) {
         console.log(error)
@@ -94,89 +94,95 @@ export async function GET(req: NextRequest) {
     }
 }
 function getCorrectMode(req: NextRequest): modeType | null {
-    const modeRough = req.nextUrl.pathname.split('/')[3].trim().toLowerCase()
+    const modeRough = req.nextUrl.pathname.split('/')[4].trim().toLowerCase()
 
     if (modeRough === 'known_writing' || modeRough === 'known_meaning' || modeRough === 'known_reading') return modeRough
 
     return null
 }
-function getReadyToTestKanjis(kanjis: IKanjiView[]): IKanjiView[] | null {
-    const readyToTest: IKanjiView[] = []
+function getReadyToTestCombos(kanjis: IComboView[]): IComboView[] | null {
+    const readyToTest: IComboView[] = []
 
     let isThereToTest = false
 
-    kanjis.forEach(kanjiObj => {
-        const lastTimeCheckTimestamp = kanjiObj.test_timestamp
+    kanjis.forEach(comboObj => {
+        const lastTimeCheckTimestamp = comboObj.test_timestamp
         
         const currentTimestamp = Date.now()
 
         if (currentTimestamp - lastTimeCheckTimestamp > TEST_COOLDOWN_TIME_MS) {
             isThereToTest = true
 
-            readyToTest.push(kanjiObj)
+            readyToTest.push(comboObj)
         }
     })
     if (!isThereToTest) return null
 
     return readyToTest
 }
-async function getNeededKanjis(kanjis: IKanjiView[], mode: modeType): Promise<ITestKanji[]> {
-    const kanjisTimeConsidered = await getKanjisWithComplexPoints(kanjis)
+async function getNeededCombos(combos: IComboView[], mode: modeType): Promise<ITestCombo[]> {
+    const combosWithComplexPoints = await getCombosWithComplexPoints(combos)
 
-    sortByPoints(kanjisTimeConsidered)
+    sortByPoints(combosWithComplexPoints)
 
-    const cutKanjis = getCutKanjis(kanjisTimeConsidered)
+    const cutComboIds = getCutComboids(combosWithComplexPoints)
 
-    const neededInfoOfKanji: ITestKanji[] = []
+    const neededInfoOfCombo: ITestCombo[] = []
 
-    if (mode !== 'known_writing') {
-        for (const writing of cutKanjis) {
+    for (const id of cutComboIds) {
+        const primeWriting = id.split('|')[0]
+
+        if (mode === 'known_writing') {
+            neededInfoOfCombo.push({id, writing: primeWriting})
+        } else {
             try {
                 const nanoServer = nano(DB_URI)
-                const kanjiDB: nano.DocumentScope<IDBKanji> = nanoServer.db.use('kanji')
-
-                const kanjiObj = await kanjiDB.get(writing)
-
+                const comboDB: nano.DocumentScope<IDBComboKanji> = nanoServer.db.use('combo-kanji')
+    
+                const comboObj = await comboDB.get(id)
+    
                 if (mode === 'known_reading') {
-                    if (!kanjiObj.kun_readings[0] && !kanjiObj.on_readings[0]) continue
-
-                    neededInfoOfKanji.push({
-                        writing,
-                        readings: kanjiObj.kun_readings.concat(kanjiObj.on_readings)
-                    })
-                }    
-                if (mode === 'known_meaning') {
-                    if (!kanjiObj.meanings[0]) continue
-
-                    neededInfoOfKanji.push({
-                        writing,
-                        meanings: kanjiObj.meanings
+                    const readings = comboObj.variants[0].readings
+    
+                    if (!readings[0]) continue
+    
+                    neededInfoOfCombo.push({
+                        id,
+                        writing: primeWriting,
+                        readings
                     })
                 }
-                
+    
+                if (mode === 'known_meaning') {
+                    const meanings = comboObj.meanings
+    
+                    if (!meanings[0]) continue
+    
+                    neededInfoOfCombo.push({
+                        id,
+                        writing: primeWriting,
+                        meanings
+                    })
+                }
             } catch (error) {
                 continue
             }
         }
-        return neededInfoOfKanji
-    } else {
-        return cutKanjis.map(writing => {
-            return {writing}
-        })
     }
+    return neededInfoOfCombo
 
 }
-async function getKanjisWithComplexPoints(kanjis: IKanjiView[]): Promise<IKanjiWithPoints[]> {
+async function getCombosWithComplexPoints(combos: IComboView[]): Promise<IComboWithPoints[]> {
     const nanoServer = nano(DB_URI)
-    const kanjiDB: nano.DocumentScope<IDBKanji> = nanoServer.db.use('kanji')
+    const comboKanjiDB: nano.DocumentScope<IDBComboKanji> = nanoServer.db.use('combo-kanji')
 
-    const updKanjis = Promise.all(kanjis.map(async kanji => {
-        const testedDaysAgo = (Date.now() - kanji.test_timestamp) / (1000 * 60 * 60 * 24)
+    const updCombos = Promise.all(combos.map(async combo => {
+        const testedDaysAgo = (Date.now() - combo.test_timestamp) / (1000 * 60 * 60 * 24)
         const daysPenalty = Math.trunc(testedDaysAgo)
 
-        const points = kanji.points
+        const points = combo.points
 
-        const frequency = await getWikiFrequency(kanji.writing) ?? 0.01
+        const frequency = await getWikiFrequency(combo.id) ?? 0.01
     
         const frequencyMultiplier = frequency <= 0.01 ? 500 : frequency <= 0.1 ? 80 : frequency <= 1 ? 10 : frequency <= 4 ? 5 : 2
     
@@ -185,18 +191,18 @@ async function getKanjisWithComplexPoints(kanjis: IKanjiView[]): Promise<IKanjiW
         const correctPoints = points - frequencyPenalty - daysPenalty
 
         return {
-            writing: kanji.writing,
+            id: combo.id,
             points: correctPoints
         }
     }))
 
-    return updKanjis
+    return updCombos
 
-    async function getWikiFrequency(writing: string): Promise<number | undefined> {
+    async function getWikiFrequency(id: string): Promise<number | undefined> {
         try {
-            const kanjiObj = await kanjiDB.get(writing)
+            const comboObj = await comboKanjiDB.get(id)
 
-            const absoluteFrequency = kanjiObj.frequencies.wikipedia?.total
+            const absoluteFrequency = comboObj.frequencies.wikipedia?.total
 
             const relativeFrequnecy = absoluteFrequency ? absoluteFrequency / PAGES_ANALYZED : undefined
     
@@ -206,35 +212,35 @@ async function getKanjisWithComplexPoints(kanjis: IKanjiView[]): Promise<IKanjiW
         }
     }
 }
-function sortByPoints(kanjis: IKanjiWithPoints[]) {
+function sortByPoints(kanjis: IComboWithPoints[]) {
     kanjis.sort((kanji_1, kanji_2) => kanji_1.points - kanji_2.points)
 }
-function getCutKanjis(kanjis: IKanjiWithPoints[]): string[] {
-    const cutKanjisArr: string[] = []
+function getCutComboids(combos: IComboWithPoints[]): string[] {
+    const cutIdsArr: string[] = []
 
-    kanjis.forEach(kanjiObj => {
-        return cutKanjisArr.push(kanjiObj.writing)
+    combos.forEach(comboObj => {
+        return cutIdsArr.push(comboObj.id)
     })
-    return cutKanjisArr
+    return cutIdsArr
 }
 
 type knowledgeLevelType = 'well' | 'medium' | 'bad' 
 
 type knownWritingParams = {
     mode: 'known_writing'
-    writing: string
+    id: string
     readingKnowledge: knowledgeLevelType
     meaningKnowledge: knowledgeLevelType
 }
 type knownMeaningParams = {
     mode: 'known_meaning'
-    writing: string
+    id: string
     readingKnowledge: knowledgeLevelType
     writingKnowledge: knowledgeLevelType
 }
 type knownReadingParams = {
     mode: 'known_reading'
-    writing: string
+    id: string
     writingKnowledge: knowledgeLevelType
     meaningKnowledge: knowledgeLevelType
 }
@@ -263,21 +269,21 @@ export async function POST(req: NextRequest) {
             message: 'Пользователь не авторизован'
         }, {status: 403})
         
-        const kanjis = user.kanjis
+        const combos = user.combos
         
-        if (!kanjis) throw new Error()
+        if (!combos) throw new Error()
         
-        const currentKanjiObj = getCurrentKanji(params.writing, kanjis)
+        const currentcomboObj = getCurrentCombo(params.id, combos)
         
-        if (!currentKanjiObj) throw new Error()
+        if (!currentcomboObj) throw new Error()
 
-        const updatedKanjiObj = getUpdKanjiObj(currentKanjiObj, params)
+        const updatedComboObj = getUpdComboObj(currentcomboObj, params)
 
-        const updKanjis = getUpdKanjis(kanjis, updatedKanjiObj)
+        const updCombos = getUpdCombos(combos, updatedComboObj)
 
         await usersDB.insert({
             ...user,
-            kanjis: updKanjis,
+            combos: updCombos,
             _rev: user._rev
         } as IUserDoc)
 
@@ -309,9 +315,9 @@ export async function POST(req: NextRequest) {
 function getParams(body: any, mode: modeType): knownWritingParams | knownReadingParams | knownMeaningParams | null {
     if (!body) return null
 
-    const writing = typeof body?.writing === 'string' ? body.writing : null
+    const id = typeof body?.id === 'string' ? body.id : null
 
-    if (!writing) return null
+    if (!id) return null
 
     switch (mode) {
         case 'known_writing': {
@@ -321,7 +327,7 @@ function getParams(body: any, mode: modeType): knownWritingParams | knownReading
 
             return {
                 mode: 'known_writing',
-                writing,
+                id,
                 readingKnowledge,
                 meaningKnowledge
             }
@@ -333,7 +339,7 @@ function getParams(body: any, mode: modeType): knownWritingParams | knownReading
 
             return {
                 mode: 'known_reading',
-                writing,
+                id,
                 writingKnowledge,
                 meaningKnowledge
             }
@@ -345,7 +351,7 @@ function getParams(body: any, mode: modeType): knownWritingParams | knownReading
 
             return {
                 mode: 'known_meaning',
-                writing,
+                id,
                 readingKnowledge,
                 writingKnowledge
             }
@@ -356,67 +362,67 @@ function getParams(body: any, mode: modeType): knownWritingParams | knownReading
 
 
 }
-function getCurrentKanji(currentWriting: string, allKanjis: usersKanji[]): usersKanji | null {
-    for (let kanjiObj of allKanjis) {
-        if (currentWriting === kanjiObj.writing) {
-            return kanjiObj
+function getCurrentCombo(currentId: string, allCombos: usersCombo[]): usersCombo | null {
+    for (let comboObj of allCombos) {
+        if (currentId === comboObj.id) {
+            return comboObj
         }
     }
     return null
 }
-function getUpdKanjiObj(kanjiObj: usersKanji, params: knownWritingParams | knownReadingParams | knownMeaningParams): usersKanji {
+function getUpdComboObj(comboObj: usersCombo, params: knownWritingParams | knownReadingParams | knownMeaningParams): usersCombo {
     const timestamp = Date.now()
 
     switch (params.mode) {
         case 'known_writing': {
-            const meaning = getPoints({kanjiObj, answer: params.meaningKnowledge, knowledgeOf: 'meaning', known: 'writing'})
-            const reading = getPoints({kanjiObj, answer: params.readingKnowledge, knowledgeOf: 'reading', known: 'writing'})
+            const meaning = getPoints({comboObj, answer: params.meaningKnowledge, knowledgeOf: 'meaning', known: 'writing'})
+            const reading = getPoints({comboObj, answer: params.readingKnowledge, knowledgeOf: 'reading', known: 'writing'})
             
-            kanjiObj.points[params.mode].meaning.points = meaning.updPoints
-            kanjiObj.points[params.mode].meaning.extra_points = meaning.updExtraPoints
+            comboObj.points[params.mode].meaning.points = meaning.updPoints
+            comboObj.points[params.mode].meaning.extra_points = meaning.updExtraPoints
             
-            kanjiObj.points[params.mode].reading.points = reading.updPoints
-            kanjiObj.points[params.mode].reading.extra_points = reading.updExtraPoints
+            comboObj.points[params.mode].reading.points = reading.updPoints
+            comboObj.points[params.mode].reading.extra_points = reading.updExtraPoints
 
-            kanjiObj.points[params.mode].total = meaning.updPoints + reading.updPoints
+            comboObj.points[params.mode].total = meaning.updPoints + reading.updPoints
             break
         }
         case 'known_reading': {
-            const writing = getPoints({kanjiObj, answer: params.writingKnowledge, knowledgeOf: 'writing', known: 'reading'})
-            const meaning = getPoints({kanjiObj, answer: params.meaningKnowledge, knowledgeOf: 'meaning', known: 'reading'})
+            const writing = getPoints({comboObj, answer: params.writingKnowledge, knowledgeOf: 'writing', known: 'reading'})
+            const meaning = getPoints({comboObj, answer: params.meaningKnowledge, knowledgeOf: 'meaning', known: 'reading'})
                     
-            kanjiObj.points[params.mode].meaning.points = meaning.updPoints
-            kanjiObj.points[params.mode].meaning.extra_points = meaning.updExtraPoints
+            comboObj.points[params.mode].meaning.points = meaning.updPoints
+            comboObj.points[params.mode].meaning.extra_points = meaning.updExtraPoints
             
-            kanjiObj.points[params.mode].writing.points = writing.updPoints
-            kanjiObj.points[params.mode].writing.extra_points = writing.updExtraPoints
+            comboObj.points[params.mode].writing.points = writing.updPoints
+            comboObj.points[params.mode].writing.extra_points = writing.updExtraPoints
 
-            kanjiObj.points[params.mode].total = meaning.updPoints + writing.updPoints
+            comboObj.points[params.mode].total = meaning.updPoints + writing.updPoints
             break
         }
         case 'known_meaning': {
-            const writing = getPoints({kanjiObj, answer: params.writingKnowledge, knowledgeOf: 'writing', known: 'meaning'})
-            const reading = getPoints({kanjiObj, answer: params.readingKnowledge, knowledgeOf: 'reading', known: 'meaning'})
+            const writing = getPoints({comboObj, answer: params.writingKnowledge, knowledgeOf: 'writing', known: 'meaning'})
+            const reading = getPoints({comboObj, answer: params.readingKnowledge, knowledgeOf: 'reading', known: 'meaning'})
                     
-            kanjiObj.points[params.mode].writing.points = writing.updPoints
-            kanjiObj.points[params.mode].writing.extra_points = writing.updExtraPoints
+            comboObj.points[params.mode].writing.points = writing.updPoints
+            comboObj.points[params.mode].writing.extra_points = writing.updExtraPoints
             
-            kanjiObj.points[params.mode].reading.points = reading.updPoints
-            kanjiObj.points[params.mode].reading.extra_points = reading.updExtraPoints
+            comboObj.points[params.mode].reading.points = reading.updPoints
+            comboObj.points[params.mode].reading.extra_points = reading.updExtraPoints
 
-            kanjiObj.points[params.mode].total = writing.updPoints + reading.updPoints
+            comboObj.points[params.mode].total = writing.updPoints + reading.updPoints
             break
         }
 
     }
-    kanjiObj.points.total = kanjiObj.points.known_meaning.total + kanjiObj.points.known_reading.total + kanjiObj.points.known_writing.total
+    comboObj.points.total = comboObj.points.known_meaning.total + comboObj.points.known_reading.total + comboObj.points.known_writing.total
     
-    kanjiObj.points[params.mode].test_timestamp = timestamp
+    comboObj.points[params.mode].test_timestamp = timestamp
 
-    return kanjiObj
+    return comboObj
 }
 interface IGetPointsProps {
-    kanjiObj: usersKanji
+    comboObj: usersCombo
     answer: knowledgeLevelType
     known: 'writing' | 'reading' | 'meaning'
     knowledgeOf: 'meaning' | 'reading' | 'writing'
@@ -428,26 +434,26 @@ interface IPoints {
 }
 type knowledgeType = 'meaning' | 'reading' | 'writing'
 
-function getPoints({kanjiObj, answer, known, knowledgeOf}: IGetPointsProps): IPoints {
+function getPoints({comboObj, answer, known, knowledgeOf}: IGetPointsProps): IPoints {
     const prevExtra = (
-        known === 'writing' && knowledgeOf === 'meaning' ? kanjiObj.points.known_writing.meaning.extra_points :
-        known === 'writing' && knowledgeOf === 'reading' ? kanjiObj.points.known_writing.reading.extra_points :
+        known === 'writing' && knowledgeOf === 'meaning' ? comboObj.points.known_writing.meaning.extra_points :
+        known === 'writing' && knowledgeOf === 'reading' ? comboObj.points.known_writing.reading.extra_points :
 
-        known === 'meaning' && knowledgeOf === 'writing' ? kanjiObj.points.known_meaning.writing.extra_points :
-        known === 'meaning' && knowledgeOf === 'reading' ? kanjiObj.points.known_meaning.reading.extra_points :
+        known === 'meaning' && knowledgeOf === 'writing' ? comboObj.points.known_meaning.writing.extra_points :
+        known === 'meaning' && knowledgeOf === 'reading' ? comboObj.points.known_meaning.reading.extra_points :
 
-        known === 'reading' && knowledgeOf === 'writing' ? kanjiObj.points.known_reading.writing.extra_points :
-        known === 'reading' && knowledgeOf === 'meaning' ? kanjiObj.points.known_reading.meaning.extra_points : 0
+        known === 'reading' && knowledgeOf === 'writing' ? comboObj.points.known_reading.writing.extra_points :
+        known === 'reading' && knowledgeOf === 'meaning' ? comboObj.points.known_reading.meaning.extra_points : 0
     )
     const prevPoints = (
-        known === 'writing' && knowledgeOf === 'meaning' ? kanjiObj.points.known_writing.meaning.points :
-        known === 'writing' && knowledgeOf === 'reading' ? kanjiObj.points.known_writing.reading.points :
+        known === 'writing' && knowledgeOf === 'meaning' ? comboObj.points.known_writing.meaning.points :
+        known === 'writing' && knowledgeOf === 'reading' ? comboObj.points.known_writing.reading.points :
 
-        known === 'meaning' && knowledgeOf === 'writing' ? kanjiObj.points.known_meaning.writing.points :
-        known === 'meaning' && knowledgeOf === 'reading' ? kanjiObj.points.known_meaning.reading.points :
+        known === 'meaning' && knowledgeOf === 'writing' ? comboObj.points.known_meaning.writing.points :
+        known === 'meaning' && knowledgeOf === 'reading' ? comboObj.points.known_meaning.reading.points :
 
-        known === 'reading' && knowledgeOf === 'writing' ? kanjiObj.points.known_reading.writing.points :
-        known === 'reading' && knowledgeOf === 'meaning' ? kanjiObj.points.known_reading.meaning.points : 0
+        known === 'reading' && knowledgeOf === 'writing' ? comboObj.points.known_reading.writing.points :
+        known === 'reading' && knowledgeOf === 'meaning' ? comboObj.points.known_reading.meaning.points : 0
     )
 
     let updExtraPoints;
@@ -486,10 +492,10 @@ function getPoints({kanjiObj, answer, known, knowledgeOf}: IGetPointsProps): IPo
     return {updPoints, updExtraPoints}
 }
 
-function getUpdKanjis(usersKanjis: usersKanji[], newKanji: usersKanji): usersKanji[] {
-    return usersKanjis.map(prevKanji => {
-        if (prevKanji.writing === newKanji.writing) return newKanji
+function getUpdCombos(usersCombos: usersCombo[], newCombo: usersCombo): usersCombo[] {
+    return usersCombos.map(prevCombo => {
+        if (prevCombo.id === newCombo.id) return newCombo
 
-        return prevKanji
+        return prevCombo
     })
 }
