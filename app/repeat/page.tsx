@@ -14,31 +14,38 @@ import style from './page.module.css'
 import Link from "next/link"
 
 interface IResponseBody extends IDefaultBodyResponse {
-    kanjis?: IKanjiProps[]
+    cards?: IKanjiProps[]
     totalAmount?: number
 }
 
-const path = `/api/profile/kanji`
+type ShowType = 'single' | 'combo'
+type Path = `/api/profile/kanji/single` | `/api/profile/kanji/combo`
 
 let isFirstLoadingProcessing = true
 
 export default function Profile() {
     const {request} = useHttp()
-    const [kanjis, setKanjis] = useState<IKanjiProps[] | null>(null)
+    const [cards, setCards] = useState<IKanjiProps[] | null>(null)
     const [index, setIndex] = useState(0)
 
     const [isResponseLoading, setIsResponseLoading] = useState(true)
 
+    const [showType, setShowType] = useState<ShowType>('single')
     const [knownValue, setKnownValue]= useState<knownValue>('writing')
     const [pointsOf, setPointsOf] = useState<pointsOf>('total')
 
     const alerts = useContext(AlertsContext)
 
+    const [path, setPath] = useState<Path>(`/api/profile/kanji/single`)
+
+
+    const [isShowTypenMenuOpened, setIsShowTypenMenuOpened] = useState(false)
     const [isKnownMenuOpened, setIsKnownMenuOpened] = useState(false)
     const [isPointsMenuOpened, setIsPointsnMenuOpened] = useState(false)
 
-    const getKanjis = useCallback(async(): Promise<void> => {
+    const getCards = useCallback(async(): Promise<void> => {
         setIsResponseLoading(true)
+        setCards(null)
 
         try {
             const body = await request({
@@ -53,12 +60,12 @@ export default function Profile() {
                 }
             }) as IResponseBody
                 
-            if (body.kanjis) setKanjis(() => {                    
-                const kanjis = body.kanjis 
+            if (body.cards) setCards(() => {                    
+                const cards = body.cards 
 
-                if (!kanjis || isArrayEmpty(kanjis)) return null
+                if (!cards || isArrayEmpty(cards)) return null
 
-                return kanjis
+                return cards
             })
         } catch (error: unknown) {
             alerts.pushAlert({
@@ -70,11 +77,17 @@ export default function Profile() {
             setIsResponseLoading(false)
             isFirstLoadingProcessing = false
         }
-    }, [knownValue, alerts, pointsOf, request])
+    }, [knownValue, alerts, pointsOf, path, request])
+
+    useEffect(() => {
+        setIsShowTypenMenuOpened(false)
+        
+        setPath(`/api/profile/kanji/${showType}`)
+    }, [showType])
     
     useEffect(() => {
-        getKanjis()
-    }, [knownValue, pointsOf, getKanjis])
+        getCards()
+    }, [knownValue, pointsOf, getCards])
 
     useEffect(() => {
         setIsKnownMenuOpened(false)
@@ -90,12 +103,12 @@ export default function Profile() {
         return !arr[0]
     }
 
-    async function removeKanji(writing: string) {
+    async function removeCard(id: string) {
         try {
             const resBody = await request({
                 path,
                 method: 'DELETE',
-                body: [writing]
+                body: [id]
             }) as IDefaultBodyResponse
 
             if (resBody.message && resBody.applicableFor === 'alert') {
@@ -105,7 +118,7 @@ export default function Profile() {
                 })
             }
 
-            deleteKanjiState(writing) 
+            deleteCardState(id) 
         } catch (error) {
             alerts.pushAlert({
                 message: 'Произошла ошибка. Попробуйте позже',
@@ -114,16 +127,16 @@ export default function Profile() {
         }
     }
 
-    function deleteKanjiState(writing: string) {
-        if (!kanjis || kanjis.length === 1) return setKanjis(null)      //если элемент единственный и в массиве ничего не осталось - ставим null
+    function deleteCardState(id: string) {
+        if (!cards || cards.length === 1) return setCards(null)      //если элемент единственный и в массиве ничего не осталось - ставим null
 
-        const updKanjis = [...kanjis]
+        const updCards = [...cards]
 
-        const index = kanjis.findIndex(kanjiObj => kanjiObj.writing === writing)
+        const index = cards.findIndex(cardsObj => cardsObj.id === id)
 
-        updKanjis.splice(index, 1)
+        updCards.splice(index, 1)
 
-        setKanjis(updKanjis)
+        setCards(updCards)
     }
 
     return (
@@ -131,6 +144,30 @@ export default function Profile() {
             <div>
                 {isResponseLoading ? <div className={style.spinner}><Spinner size={30}/></div> : null}
                 <div className={style['sort-container']}>
+                    <div className={isShowTypenMenuOpened ? style.active : ''}>
+                        <label>Показать иероглифы</label>
+                        <div 
+                            className={style.field}
+                            onClick={() => setIsShowTypenMenuOpened(prev => !prev)}
+                            >
+                            {
+                                showType === 'single' ? 'одиночные' : 'сочетания'
+                            }
+                            <span><SortTriangle/></span>
+                        </div>
+                        <ul>
+                            <li 
+                                className={showType === 'single' ? style.active : ''}
+                                onClick={() => setShowType('single')}
+                                >одиночные
+                            </li>
+                            <li 
+                                className={showType === 'combo' ? style.active : ''}
+                                onClick={() => setShowType('combo')}
+                                >сочетания
+                            </li>
+                        </ul>
+                    </div>
                     <div className={isKnownMenuOpened ? style.active : ''}>
                         <label>С известным</label>
                         <div 
@@ -225,25 +262,19 @@ export default function Profile() {
                     </div>
                 </div>
                 {
-                    kanjis ?
-                        <Masonry
-                        className={style.cards}
-                            items={kanjis}
-                            config={{
-                                columns: [1, 2, 3, 4],
-                                gap: [48, 48, 48, 48],
-                                media: [730, 1024, 1366, 1440],
-                            }}
-                            render={(kanjiObj) => (
-                                <Card 
-                                    kanjiInfo={kanjiObj}
-                                    knownValue={knownValue}
-                                    key={kanjiObj.writing}
-                                    removeKanji={removeKanji}
-                                />
-                            )}
-                        /> : !isResponseLoading ? 
-                        <p className={style['non-kanji-plug']}>Кажется, вы ещё не добавили иероглифы к повторению.<br/>Посмотрите в <Link href={'/kanji/single'}>списке</Link>.</p> : 
+                    cards ?
+                        cards.map(cardObj => {
+                            return (<Card 
+                                cardInfo={cardObj}
+                                knownValue={knownValue}
+                                key={cardObj.id}
+                                removeCard={removeCard}
+                            />)
+                        }) : !isResponseLoading ? 
+                        <p className={style['non-kanji-plug']}>
+                            Кажется, вы ещё не добавили {showType === 'single' ? 'иероглифы' : 'сочетания'} к повторению.<br/>
+                            Посмотрите в <Link href={`/kanji/${showType === 'single' ? 'single' : 'combo'}`}>списке</Link>.
+                        </p> : 
                         null 
                 }
             </div>

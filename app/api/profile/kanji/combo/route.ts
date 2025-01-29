@@ -1,8 +1,9 @@
 import { IDBKanji, IKanjiProps, IKanjiWithPointsBrief, knownValue } from "@/app/interfaces/kanji.interface"
-import { IUserDoc, usersKanji } from "@/app/interfaces/user.interface"
-import getUser from "../../auxiliaries/getUser"
+import { IUserDoc, usersCombo, usersKanji } from "@/app/interfaces/user.interface"
+import getUser from "../../../auxiliaries/getUser"
 import { NextRequest } from "next/server"
 import nano from "nano"
+import { IComboProps, IComboWithPointsBrief, IDBComboKanji } from "@/app/interfaces/combo-kanji.interface"
 
 const DB_URI = process.env.COUCHDB_URI!
 
@@ -12,9 +13,9 @@ export async function POST(req: NextRequest) {
     try {
         const body = await req.json()
 
-        const kanji = body?.writing
+        const id = body?.id
 
-        if (!kanji) return Response.json({
+        if (!id) return Response.json({
             message: 'Отсутствуют данные'
         }, {status: 400})
     
@@ -27,14 +28,14 @@ export async function POST(req: NextRequest) {
             message: 'Пользователь не авторизован'
         }, {status: 403})
 
-        if (!isKanjiNew(kanji, user)) return Response.json({
-            message: 'Иероглиф уже был добавлен',
+        if (!isComboNew(id, user)) return Response.json({
+            message: 'Сочетание уже было добавлено',
             applicableFor: 'alert',
             success: false
         }, {status: 208})
 
-        const fullInfoKanji: usersKanji = {
-            writing: kanji,
+        const fullInfoCombo: usersCombo = {
+            id,
             points: {
                 total: 0,
                 known_writing: {
@@ -77,16 +78,16 @@ export async function POST(req: NextRequest) {
             addition_timestamp: Date.now()
         }
 
-        const updKanjis = user.kanjis ? [...user.kanjis, fullInfoKanji] : [fullInfoKanji];
+        const updCombos = user.combos ? [...user.combos, fullInfoCombo] : [fullInfoCombo];
 
         await usersDB.insert({
             ...user,
-            kanjis: updKanjis
+            combos: updCombos
         } as IUserDoc)
 
         return Response.json(
             {
-                message: 'Иероглиф добавлен',
+                message: 'Сочетание добавлено',
                 applicableFor: 'alert',
                 success: true
             }, {status: 200})
@@ -98,20 +99,20 @@ export async function POST(req: NextRequest) {
             message: 'Ошибка сервера'
         }, {status: 500})
     }
-    function isKanjiNew(searchedKanji: string, user: IUserDoc) {
-        if (!user.kanjis) return true
+    function isComboNew(id: string, user: IUserDoc) {
+        if (!user.combos) return true
     
-        for (let kanjiObj of user.kanjis) {
-            if (kanjiObj.writing === searchedKanji) return false
+        for (let comboObj of user.combos) {
+            if (comboObj.id === id) return false
         }
         return true
     }
 }
 
-interface IKanjiWithPointsView {
+interface IComboWithPointsView {
     id: string 
     key: string 
-    value: usersKanji
+    value: usersCombo
     doc?: Document | undefined
 }
 interface IOptions {
@@ -158,23 +159,24 @@ export async function GET(req: NextRequest) {
             message: 'Пользователь не авторизован'
         }, {status: 403})
         
-        const userskanjiView = await usersDB.view('others', 'kanji_with_points', {key: user.email})
+        const usersComboView = await usersDB.view('others', 'combo_with_points', {key: user.email})
         
-        const kanjis = userskanjiView.rows as IKanjiWithPointsView[]
+        const combos = usersComboView.rows as IComboWithPointsView[]
 
-        const totalRelevantAmount = kanjis.length
+        
+        const totalRelevantAmount = combos.length
 
         if (totalRelevantAmount === 0) return Response.json({
-            message: 'Иероглифы не добавлены'
-        }, {status: 200})                                   //204 статус выдаёт ошибку, поэтому просто не возвращаем массив kanjis
-
-        const preparedKanjis = await prepareKanjis(kanjis, {sort, descending})
-
-        const fullInfoKanjis = await getFullInfoKanji(preparedKanjis, sort.knownValue)
+            message: 'Сочетания не добавлены'
+        }, {status: 200})                                   //204 статус выдаёт ошибку, поэтому просто не возвращаем массив combos
+        
+        const preparedCombos = await prepareCombos(combos, {sort, descending})
+        
+        const fullInfoCombos = await getFullInfoCombos(preparedCombos, sort.knownValue)
         
         return Response.json(
             {
-                kanjis: fullInfoKanjis
+                cards: fullInfoCombos
             }, 
             {status: 200}
         )
@@ -216,95 +218,87 @@ export async function GET(req: NextRequest) {
     function getAcceptableDescending(descending: any): boolean {
         return descending === 'true' ? true : false
     }
-    async function getFullInfoKanji(kanjis: string[], knownValue: knownValue): Promise<IKanjiProps[]> {
+    async function getFullInfoCombos(ids: string[], knownValue: knownValue): Promise<IComboProps[]> {
         try {
-            const kanjisFullInfo: IKanjiProps[] = []
+            const combosFullInfo: IComboProps[] = []
             
             const nanoServer = nano(DB_URI)
 
-            const kanjiDB: nano.DocumentScope<IDBKanji> = nanoServer.db.use('kanji')
+            const comboDB: nano.DocumentScope<IDBComboKanji> = nanoServer.db.use('combo-kanji')
 
-            for (const writing of kanjis) {
+            for (const id of ids) {
                 try {
-                    const kanjiWritingView = await kanjiDB.get(writing)
+                    const kanjiWritingView = await comboDB.get(id)
+
+                    const primeWriting = kanjiWritingView.variants[0].writing
+                    const primeReadings = kanjiWritingView.variants[0].readings
+                    const meanings = kanjiWritingView.meanings
 
                     if (
-                        (knownValue === 'writing' && !kanjiWritingView.writing) ||
-                        (knownValue === 'reading' && !kanjiWritingView.kun_readings[0] && !kanjiWritingView.on_readings[0]) ||
-                        (knownValue === 'meaning' && !kanjiWritingView.meanings[0]) 
+                        (knownValue === 'writing' && !primeWriting[0]) ||
+                        (knownValue === 'reading' && !primeReadings[0]) ||
+                        (knownValue === 'meaning' && !meanings[0]) 
                     ) continue
                     
-                    kanjisFullInfo.push({
-                        writing: kanjiWritingView.writing,
-                        kun_readings: kanjiWritingView.kun_readings,
-                        on_readings: kanjiWritingView.on_readings,
+                    combosFullInfo.push({
+                        id,
+                        writing: primeWriting,
+                        readings: primeReadings,
                         meanings: kanjiWritingView.meanings
                     })
                     
                 } catch (error) {
-                    kanjisFullInfo.push({
-                        writing: writing,
-                        kun_readings: [],
-                        on_readings: [],
-                        meanings: []
-                    })
+                    continue
                 }
 
             }
-            return kanjisFullInfo
+            return combosFullInfo
             
         } catch (error) {
             console.log(error)
 
-            return kanjis.map(kanji => {
-                return {
-                    writing: kanji,
-                    kun_readings: [],
-                    on_readings: [],
-                    meanings: []
-                }
-            })
+            throw new Error()
         }
     }
-    async function prepareKanjis(roughKanjis: IKanjiWithPointsView[], options: {sort: sortType, descending: boolean}): Promise<string[]> {
-        const briefKanjis = getBriefKanjis(roughKanjis)
+    async function prepareCombos(roughCombos: IComboWithPointsView[], options: {sort: sortType, descending: boolean}): Promise<string[]> {
+        const briefCombo = getBriefCombos(roughCombos)
 
-        sortKanjis(briefKanjis, options.sort, options.descending)
+        sortCombo(briefCombo, options.sort, options.descending)
 
-        const onlyWritings = briefKanjis.map(kanji => kanji.writing)
+        const onlyWritings = briefCombo.map(combo => combo.writing)
         
         return onlyWritings
     }
-    function getBriefKanjis(kanjis: IKanjiWithPointsView[]): IKanjiWithPointsBrief[] {
-        return kanjis.map(kanjiObj => {
+    function getBriefCombos(combos: IComboWithPointsView[]): IComboWithPointsBrief[] {
+        return combos.map(comboObj => {
             return {
-                id: kanjiObj.id,
-                writing: kanjiObj.value.writing,
+                id: comboObj.id,
+                writing: comboObj.value.id.split('|')[0],
                 points: {
-                    total: kanjiObj.value.points.total,
+                    total: comboObj.value.points.total,
                     known_writing: {
-                        total: kanjiObj.value.points.known_writing.total,
-                        reading: kanjiObj.value.points.known_writing.reading.points,
-                        meaning: kanjiObj.value.points.known_writing.meaning.points
+                        total: comboObj.value.points.known_writing.total,
+                        reading: comboObj.value.points.known_writing.reading.points,
+                        meaning: comboObj.value.points.known_writing.meaning.points
                     },
                     known_reading: {
-                        total: kanjiObj.value.points.known_reading.total,
-                        writing: kanjiObj.value.points.known_reading.writing.points,
-                        meaning: kanjiObj.value.points.known_reading.meaning.points
+                        total: comboObj.value.points.known_reading.total,
+                        writing: comboObj.value.points.known_reading.writing.points,
+                        meaning: comboObj.value.points.known_reading.meaning.points
                     },
                     known_meaning: {
-                        total: kanjiObj.value.points.known_meaning.total,
-                        reading: kanjiObj.value.points.known_meaning.reading.points,
-                        writing: kanjiObj.value.points.known_meaning.writing.points
+                        total: comboObj.value.points.known_meaning.total,
+                        reading: comboObj.value.points.known_meaning.reading.points,
+                        writing: comboObj.value.points.known_meaning.writing.points
                     }
                 }
             }
         })
     }
-    function sortKanjis(kanjis: IKanjiWithPointsBrief[], sort: sortType, descending: boolean): IKanjiWithPointsBrief[] {
+    function sortCombo(combos: IComboWithPointsBrief[], sort: sortType, descending: boolean): IComboWithPointsBrief[] {
         const knownValue = sort.knownValue
 
-        return kanjis.sort((a, b) => {
+        return combos.sort((a, b) => {
             switch (knownValue) {
                 case 'writing':
                     return descending ? 
@@ -326,9 +320,9 @@ export async function GET(req: NextRequest) {
 }
 export async function DELETE(req: NextRequest) {
     try {
-        const kanjisToDelete = await req.json()
+        const combosToDelete = await req.json()
 
-        const isArray = Array.isArray(kanjisToDelete)
+        const isArray = Array.isArray(combosToDelete)
     
         if (!isArray) return Response.json({
             message: 'Неверные данные'
@@ -343,15 +337,15 @@ export async function DELETE(req: NextRequest) {
             message: 'Пользователь не авторизован'
         }, {status: 403})
     
-        const remainingKanjis = getRemainingKanjis(kanjisToDelete, user)
+        const remainingCombos = getRemainingCombos(combosToDelete, user)
 
         await usersDB.insert({
             ...user,
-            kanjis: remainingKanjis
+            combos: remainingCombos
         } as IUserDoc)
 
         return Response.json({
-            message: 'Иероглиф удалён',
+            message: 'Сочетание удалено',
             applicableFor: 'alert',
             success: true
         }, {status: 200})
@@ -363,24 +357,24 @@ export async function DELETE(req: NextRequest) {
             message: 'Ошибка сервера'
         }, {status: 500})
     }
-    function getRemainingKanjis(writingsToDelete: any[], user: IUserDoc): usersKanji[]  {
-        const allKanjis = user.kanjis
+    function getRemainingCombos(idsToDelete: any[], user: IUserDoc): usersCombo[]  {
+        const allCombos = user.combos
 
-        if (!allKanjis) return []
+        if (!allCombos) return []
 
-        const remainingKanjis: usersKanji[] = []
+        const remainingCombos: usersCombo[] = []
         
-        allKanjis.forEach((kanjiToCheck) => {
+        allCombos.forEach((comboToCheck) => {
             let isCardRemain = true
 
-            writingsToDelete.forEach(writingToDelete => {
-                if (kanjiToCheck.writing === writingToDelete) {
+            idsToDelete.forEach(idToDelete => {
+                if (comboToCheck.id === idToDelete) {
                     isCardRemain = false
                 }
             })
-            if (isCardRemain) remainingKanjis.push(kanjiToCheck)
+            if (isCardRemain) remainingCombos.push(comboToCheck)
         })
         
-        return remainingKanjis
+        return remainingCombos
     }
 }

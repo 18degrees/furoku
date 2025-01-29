@@ -1,4 +1,75 @@
+.show-btns {
+    display: flex;
+    justify-content: flex-end;
+    column-gap: 10px;
+}
+.show-btns button {
+    width: 145px;
+    padding: 5px 0;
+    border: 1px solid #F1E6F1;
+    background-color: #fff8ff;
+}
+.show-btns button.active {
+    background-color: #f5f0f5;
+    border: 1px solid #F1E6F1
+}
 .card {
+    min-height: 147px;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 40px;
+    background-color: #fff8ff;
+    border: 1px solid #F1E6F1;
+    column-gap: 20px;
+    position: relative;
+}
+
+.card .remove {
+    position: absolute;
+    bottom: 8px;
+    left: 10px
+    
+}
+.card p {
+    color: #675d67;
+
+}
+.card > div, 
+.card > ul {
+    width: 30%;
+    padding: 0;
+    margin: auto;
+    list-style: none;
+}
+.card > div > p,
+.card > div > ul {
+    padding: 0;
+    width: fit-content;
+    margin: auto;
+    list-style: none;
+}
+
+.writing p {
+    font-size: 60px;
+}
+.card div:nth-of-type(2) ul {
+    font-size: 20px;
+}
+
+@media screen and (max-width: 730px) {
+    .card {
+        flex-direction: column;
+        row-gap: 30px;
+    }
+    .card > div > ul {
+        margin: 0;
+    }
+    .card > div {
+        width: 80%;
+    }
+}
+/* .card {
     background-color: #fff8ff;
     border: 1px solid #f1e6f1;
     padding: 30px 20px 20px 20px;
@@ -58,4 +129,4 @@
 .card div i {
     word-spacing: normal;
     font-size: 18px;
-}
+} */

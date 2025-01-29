@@ -1,8 +1,9 @@
 .container {
     width: 80%;
     margin: auto;
-    padding: 40px 0
- }
+    padding: 40px 0;
+    max-width: 800px;
+}
 .spinner {
     position: absolute;
     right: 15px;
@@ -10,16 +11,18 @@
 }
 
 .sort-container {
-    margin: 0 auto 40px auto;
+    margin-bottom: 60px;
     display: flex;
     width: fit-content;
+    column-gap: 30px;
+}
+.sort-container,
+.sort-container li {
     font-size: 17px;
+
 }
 .sort-container > div {
     position: relative;
-}
-.sort-container > div:first-of-type {
-    margin-right: 50px;
 }
 .sort-container .field {
     margin-top: 5px;
@@ -48,7 +51,10 @@
     z-index: 100;
 }
 .sort-container > div.active ul {
-    height: 112px;
+    height: 125px;
+}
+.sort-container > div:first-of-type.active ul {
+    height: 80px
 }
 .sort-container > div span {
     transition: .5s all;
@@ -70,11 +76,14 @@
     justify-items: center;
 }
 
+.non-kanji-plug {
+    text-align: center;
+}
+
 @media screen and (max-width: 730px) {
     .sort-container {
-        display: block;
-    }
-    .sort-container > div:first-of-type {
-        margin: 0 0 40px 0;
+        flex-direction: column;
+        row-gap: 30px;
+        margin: 0 auto 60px auto;
     }
 }
