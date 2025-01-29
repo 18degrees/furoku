@@ -67,8 +67,8 @@ export interface ITestKanji {
 }
 
 export interface IKanjiProps {
+    id: string
     writing: string
-    kun_readings: string[]
-    on_readings: string[]
+    readings: string[]
     meanings: string[]
 }
