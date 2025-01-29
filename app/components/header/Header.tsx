@@ -46,7 +46,7 @@ export function Header() {
                                 <Link 
                                     href='/'
                                     onClick={() => setIsNavOpened(false)}
-                                    >Главная
+                                    >О сайте
                                 </Link>
                             </li>
                             <li>
