@@ -51,7 +51,7 @@ export function Header() {
                             </li>
                             <li>
                                 <Link 
-                                    href='/kanji/single'
+                                    href='/kanji'
                                     onClick={() => setIsNavOpened(false)}
                                     >Иероглифы
                                 </Link>
@@ -109,7 +109,7 @@ export function Header() {
                                 .nav li:first-of-type {
                                     background-color: #6e596d
                                 }
-                            ` : pathname === '/kanji/single' ? `
+                            ` : pathname === '/kanji' ? `
                                 .nav li:nth-of-type(2) {
                                     background-color: #6e596d
                                 }
