@@ -1,6 +1,6 @@
 import { IDBKanji, ISearchKanji } from '@/app/interfaces/kanji.interface'
 import { IUserDoc } from '@/app/interfaces/user.interface'
-import getUser from '../../auxiliaries/getUser'
+import getUser from '../../../auxiliaries/getUser'
 import { NextRequest } from "next/server"
 import type { Document } from 'nano'
 import nano from 'nano'
@@ -204,7 +204,7 @@ async function getPreparedKanjis(params: IPrepParams) {
     const totalRelevantKanjis = kanjisWithOwnerInfo.length
     
     // let briefKanjis = getBriefKanjis(kanjis)
-    const sortedKanjis = params.searchMethod === 'byWriting' || params.filterMethod ? sortKanjis(kanjisWithOwnerInfo, params.sortMethod === 'wiki') : kanjisWithOwnerInfo        //отедльная сортировка по частоте для 'byWriting' требуется, так как при поиске 'byFrequency' она автоматически сортировалась nano, здесь же - нет
+    const sortedKanjis = params.searchMethod === 'byWriting' || params.filterMethod ? sortKanjis(kanjisWithOwnerInfo, params.sortMethod === 'wiki') : kanjisWithOwnerInfo        //отдельная сортировка по частоте для 'byWriting' требуется, так как при поиске 'byNumber' она автоматически сортировалась nano, здесь же - нет
     
     const cutKanjis = cutKanjisForPage(sortedKanjis, params.page)
     
@@ -239,7 +239,7 @@ function getAppropriateKanjis({kanjis, filterMethod, sortMethod, searchMethod, l
         const writing = kanjiObj.id
 
         const filterIndex = searchMethod === 'byNumber' && filterMethod ? Number(kanjiObj.key) : filterMethod ? kanjiObj.value[filterMethod] : undefined
-        const sortIndex = filterMethod ? kanjiObj.value[sortMethod] : Number(kanjiObj.key)
+        const sortIndex = filterMethod ? kanjiObj.value[sortMethod] : searchMethod === 'byNumber' ? Number(kanjiObj.key) : Number(kanjiObj.value)
 
         return {
             id: writing,

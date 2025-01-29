@@ -1,0 +1,63 @@
+.card-container {
+    margin-bottom: 30px;
+
+}
+.card {
+    border: 1px solid #f1e6f1;
+    background-color: #fff8ff;
+    padding: 20px;
+    position: relative;
+    min-height: 224px;
+}
+.sort {
+    font-size: 18px;
+    position: absolute;
+    top: 5px;
+    right: 15px;
+    color: #675d67;
+}
+.writing {
+    font-size: 50px;
+    color: #675d67;
+}
+.readings {
+    margin-bottom: 10px;
+}
+.readings > p {
+    font-size: 25px;
+    color: #8D828D;
+    line-height: 30px;
+}
+.meanings > p {
+    font-size: 18px;
+    color: #675D67;
+}
+
+.variants {
+    margin-top: 30px;
+    display: flex;
+    column-gap: 50px;
+    overflow-x: auto;
+    white-space: nowrap;
+    color: #978c97;
+}
+.variants .writing {
+    font-size: 30px;
+}
+.variants .readings > p {
+    font-size: 20px;
+}
+
+.btn-box {
+    border: 1px solid #f1e6f1;
+    background-color: #fff8ff;
+    margin: 3px 0 30px auto;
+    width:fit-content
+}
+.btn-box.inactive {
+    display: none;
+}
+.btn-box button {
+    width: 45px;
+    height: 45px;
+}

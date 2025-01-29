@@ -3,9 +3,10 @@
 import { AlertsContext } from '../../components/providers/Alerts/AlertsProvider'
 import { useState, useEffect, useRef, useCallback, useContext } from 'react'
 import { IDefaultBodyResponse } from '../../interfaces/response.interface'
-import { ISearchKanji } from '../../interfaces/kanji.interface'
+import { ISearchComboKanji } from '@/app/interfaces/combo-kanji.interface'
+import { filterMethod, level } from '@/app/interfaces/search.interface'
 import { Spinner } from '../../components/spinner/Spinner'
-import type { TouchEvent, MouseEvent, ChangeEvent } from 'react'
+import type { TouchEvent, MouseEvent } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useHttp } from '../../hooks/http.hook'
 import { Card } from './components/card/Card'
@@ -14,10 +15,9 @@ import { useRouter } from 'next/navigation'
 import { alegreya } from '../../fonts'
 import style from './page.module.css'
 import Link from 'next/link'
-import { filterMethod, level, sortMethod } from '@/app/interfaces/search.interface'
 
 interface IBody extends IDefaultBodyResponse {
-    kanjis: ISearchKanji[]
+    combos: ISearchComboKanji[]
     totalAmount: number
 }
 const SWIPE_MODE_WIDTH = 700
@@ -42,15 +42,16 @@ export default function Page() {
     const [searchText, setSearchText] = useState<text>(getTextInitial)
 
     const [filterMethod, setFilterMethod] = useState<filterMethod>(getInitialFilterMethod)
-    const [sortMethod, setSortMethod] = useState<sortMethod>(getInitialSortMethod)
 
     const page = useRef<page>(getPageInitial())
     const level = useRef<level>(getLevelInitial())
-    const includeLearnt = useRef<includeLearnt>(getIncludeLearntInitial())
+    const includeLearntCombo = useRef<includeLearnt>(getIncludeLearntComboInitial())
+    const onlyLearntKanji = useRef<includeLearnt>(getOnlyLearntKanjiInitial())
+
     const pagesAmount = useRef<page | ''>('')
 
     const [cards, setCards] = useState<JSX.Element[] | null>(() => putBlankCards())
-    const [hasStateOfKanjiJustBeenChanged, setHasStateOfKanjiJustBeenChanged] = useState<boolean>(false)
+    const [hasStateOfComboJustBeenChanged, setHasStateOfComboJustBeenChanged] = useState<boolean>(false)
         
     const [leftCoord, setLeftCoord] = useState(0)
 
@@ -63,13 +64,6 @@ export default function Page() {
 
         return (
             method === 'jlpt' || method === 'grade' || method === '' ? method : ''
-        )
-    }
-    function getInitialSortMethod(): sortMethod {
-        const method = params.get('sort')
-
-        return (
-            method === 'stroke' || method === 'mainichi' || method === 'wiki' ? method : 'wiki'
         )
     }
     function getTextInitial(): text {
@@ -92,14 +86,24 @@ export default function Page() {
             level === 'all' ? level : 'all'
         )
     }
-    function getIncludeLearntInitial(): includeLearnt {
-        const includeLearnt = params.get('includeLearnt')
+
+    function getIncludeLearntComboInitial(): includeLearnt {
+        const includeLearnt = params.get('includeLearntCombo')
         
         return (
             includeLearnt === 'true' || 
             includeLearnt === '1' ? true : false
         )
     }
+    function getOnlyLearntKanjiInitial(): includeLearnt {
+        const includeLearnt = params.get('onlyLearntKanji')
+        
+        return (
+            includeLearnt === 'true' || 
+            includeLearnt === '1' ? true : false
+        )
+    }
+
     function getPageInitial(): page {
         const pageParam = params.get('page')
         const page = pageParam ? pageParam : '1'
@@ -128,14 +132,26 @@ export default function Page() {
 
     }
 
-    function changeIncludeLearnt(newIncludeLeantStatus: includeLearnt) {
+    function changeIncludeLearntCombo(newIncludeLearntStatus: includeLearnt) {
         const pathToModify = new URL(window.location.href);
 
-        (newIncludeLeantStatus === false) ? 
-        pathToModify.searchParams.delete('includeLearnt') : 
-        pathToModify.searchParams.set('includeLearnt', newIncludeLeantStatus.toString())
+        (newIncludeLearntStatus === false) ? 
+        pathToModify.searchParams.delete('includeLearntCombo') : 
+        pathToModify.searchParams.set('includeLearntCombo', newIncludeLearntStatus.toString())
 
-        includeLearnt.current = newIncludeLeantStatus
+        includeLearntCombo.current = newIncludeLearntStatus
+
+        router.push(`${pathToModify.pathname}${pathToModify.search}`)
+    }
+
+    function changeShowOnlyLearntKanji(newOnlyLearntKanji: includeLearnt) {
+        const pathToModify = new URL(window.location.href);
+
+        (newOnlyLearntKanji === false) ? 
+        pathToModify.searchParams.delete('onlyLearntKanji') : 
+        pathToModify.searchParams.set('onlyLearntKanji', newOnlyLearntKanji.toString())
+
+        onlyLearntKanji.current = newOnlyLearntKanji
 
         router.push(`${pathToModify.pathname}${pathToModify.search}`)
     }
@@ -191,24 +207,6 @@ export default function Page() {
 
         router.push(`${pathToModify.pathname}${pathToModify.search}`)
     }
-    function onSortMethodChange(method: sortMethod) {
-        setSortMethod(method)
-
-        const pathToModify = new URL(window.location.href)
-
-        method === 'wiki' ? pathToModify.searchParams.delete('sort') : pathToModify.searchParams.set('sort', method)
-
-        if (page.current !== 1) {
-            pathToModify.searchParams.delete('page')
-            page.current = 1
-        }
-        if (level.current !== 'all') {
-            pathToModify.searchParams.delete('level')
-            level.current = 'all'
-        }
-
-        router.push(`${pathToModify.pathname}${pathToModify.search}`)
-    }
     function onPageIncrement(): void {
         if (page.current !== pagesAmount.current) {
             changePage(page.current + 1)
@@ -235,34 +233,36 @@ export default function Page() {
         return blankCards
     }
 
-    const clearAddStatus = () => setHasStateOfKanjiJustBeenChanged(false)
+    const clearAddStatus = () => setHasStateOfComboJustBeenChanged(false)
         
     useEffect(() => {
         clearAddStatus()
         
         async function getCards(): Promise<void> {
-            const kanjis = await loadCards()
+            const combos = await loadCards()
 
             setCards(() => {
-                if (isArrayEmpty(kanjis)) return null
+                if (isArrayEmpty(combos)) return null
 
-                return kanjis.map((kanjiInfo => {
+                return combos.map((comboObj => {
                     return (
                         <Card 
                             mode='FILLED'
-                            index={kanjiInfo.index} 
-                            writing={kanjiInfo.writing}  
-                            key={kanjiInfo.id} 
-                            isCardAdded={kanjiInfo.added}
-                            setHasStateOfKanjiJustBeenChanged={setHasStateOfKanjiJustBeenChanged}
+                            index={comboObj.index} 
+                            variants={comboObj.variants}
+                            meanings={comboObj.meanings}
+                            id={comboObj.id}
+                            key={comboObj.id} 
+                            isCardAdded={comboObj.added}
+                            setHasStateOfComboJustBeenChanged={setHasStateOfComboJustBeenChanged}
                         />
                     )
                 }))
             })
         }
-        async function loadCards(): Promise<ISearchKanji[]> {
+        async function loadCards(): Promise<ISearchComboKanji[]> {
             try {
-                const path = `/api/db/kanji/single?${params.toString()}`
+                const path = `/api/db/kanji/combo?${params.toString()}`
 
                 setIsLoadingProcessing(true)
         
@@ -272,9 +272,9 @@ export default function Page() {
 
                 setPagesAmount(json.totalAmount)
                 
-                const kanjis = json.kanjis
+                const combos = json.combos
                 
-                return kanjis
+                return combos
                 
             } catch (error) {
                 setIsLoadingProcessing(false)
@@ -305,7 +305,7 @@ export default function Page() {
         }
 
         getCards()
-    }, [params, hasStateOfKanjiJustBeenChanged, alerts, changePage, request])
+    }, [params, hasStateOfComboJustBeenChanged, alerts, changePage, request])
 
     function isPageCorrect(consideredPage: number) {
         if (consideredPage <= 0) return false
@@ -390,12 +390,11 @@ export default function Page() {
     return (
         <div className={`${style.container}`}>
             {isLoadingProcessing ? <div className={style.spinner}><Spinner size={50}/></div> : null}
-            <h1 className={alegreya.className}>Список иероглифов</h1>
+            <h1 className={alegreya.className}>Список сочетаний иероглифов</h1>
             <div className={style.description}>
-                <p>Здесь вы найдёте доступные к повторению иероглифы.</p>
+                <p>Здесь вы найдёте доступные к повторению сочетания&nbsp;иероглифов.</p>
                 <p>Подробнее о содержимом карточек и упрощении поиска смотрите на <Link href='/kanji/info'>информационной странице</Link>.</p>
             </div>
-            {/* <div className={style['sort-block']}> */}
             <div className={style.settings}>
                 <div className={style.filter}>
                     <p>Фильтрация</p>
@@ -464,38 +463,6 @@ export default function Page() {
                         </select>
                     }
                 </div>
-                <div className={style.sort}>
-                    <p>Сортировка по</p>
-                    <div className={style.radios}>
-                        <label>Частоте в вики
-                            <input 
-                                type='radio' 
-                                name='sort' 
-                                value='wiki' 
-                                defaultChecked={sortMethod === 'wiki'} 
-                                onChange={() => onSortMethodChange('wiki')}
-                                />
-                        </label>
-                        <label>Частоте в газете &quot;Маинити&quot;
-                            <input 
-                                type='radio' 
-                                name='sort' 
-                                value='mainichi' 
-                                defaultChecked={sortMethod === 'mainichi'} 
-                                onChange={() => onSortMethodChange('mainichi')}
-                                />
-                        </label>
-                        <label>Количеству черт
-                            <input 
-                                type='radio' 
-                                name='sort' 
-                                value='stroke' 
-                                defaultChecked={sortMethod === 'stroke'} 
-                                onChange={() => onSortMethodChange('stroke')}
-                                />
-                        </label>
-                    </div>
-                </div>
                 <div>
                     <input 
                         type='text'
@@ -508,126 +475,23 @@ export default function Page() {
                         <input 
                             type='checkbox' 
                             id='learning-include'
-                            onChange={event => changeIncludeLearnt(event.target.checked)}
-                            checked={includeLearnt.current}
+                            onChange={event => changeIncludeLearntCombo(event.target.checked)}
+                            checked={includeLearntCombo.current}
                             disabled={!session}
                         ></input>
-                        <label htmlFor='learning-include'>Показать изучаемые кандзи</label>
-                    </div>
-                </div>
-                {/* <div>
-                    <p>Отобразить по</p>
-                    <div className={style.radios}>
-                        <label>JLPT
-                            <input 
-                                type='radio' 
-                                name='sort' 
-                                value='jlpt' 
-                                defaultChecked={sortMethod === 'jlpt'} 
-                                onChange={() => onSortMethodChange('jlpt')}
-                                />
-                        </label>
-                        <label>Чертам
-                        <input 
-                                type='radio' 
-                                name='sort' 
-                                value='stroke' 
-                                defaultChecked={sortMethod === 'stroke'} 
-                                onChange={() => onSortMethodChange('stroke')}
-                                />
-                        </label>
-                        <label>Газете &quot;Маинити&quot;
-                        <input 
-                                type='radio' 
-                                name='sort' 
-                                value='mainichi' 
-                                defaultChecked={sortMethod === 'mainichi'} 
-                                onChange={() => onSortMethodChange('mainichi')}
-                                />
-                        </label>
-                        <label>Классу
-                        <input 
-                                type='radio' 
-                                name='sort' 
-                                value='grade' 
-                                defaultChecked={sortMethod === 'grade'} 
-                                onChange={() => onSortMethodChange('grade')}
-                                />
-                        </label>
-                        <label>Частоте в вики
-                        <input 
-                                type='radio' 
-                                name='sort' 
-                                value='wiki' 
-                                defaultChecked={sortMethod === 'wiki'} 
-                                onChange={() => onSortMethodChange('wiki')}
-                                />
-                        </label>
-                    </div>
-                    <div>
-                        <input 
-                            type='text'
-                            onChange={(event) => setSearchText(event.target.value)}
-                            value={searchText}
-                            spellCheck={false}
-                            placeholder='Поиск'
-                        />
-                        {sortMethod === 'wiki' || sortMethod === 'mainichi' ? <select 
-                            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => changeLevel(event.target.value as level)}
-                            value={level.current}
-                            disabled={!!searchText}
-                            >
-                            <option value='all'>Все</option>
-                            <option value='5'>Уровень 5</option>
-                            <option value='4'>Уровень 4</option>
-                            <option value='3'>Уровень 3</option>
-                            <option value='2'>Уровень 2</option>
-                            <option value='1'>Уровень 1</option>
-                        </select> : sortMethod === 'jlpt' ? <select 
-                            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => changeLevel(event.target.value as level)}
-                            value={level.current}
-                            disabled={!!searchText}
-                            >
-                            <option value='all'>Все</option>
-                            <option value='5'>N5</option>
-                            <option value='4'>N4</option>
-                            <option value='3'>N3</option>
-                            <option value='2'>N2</option>
-                            <option value='1'>N1</option>
-                        </select> : sortMethod === 'grade' ? <select 
-                            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => changeLevel(event.target.value as level)}
-                            value={level.current}
-                            disabled={!!searchText}
-                            >
-                            <option value='all'>Все</option>
-                            <option value='1'>Класс 1</option>
-                            <option value='2'>Класс 2</option>
-                            <option value='3'>Класс 3</option>
-                            <option value='4'>Класс 4</option>
-                            <option value='5'>Класс 5</option>
-                            <option value='6'>Класс 6</option>
-                            <option value='7'>Класс 7</option>
-                            <option value='8'>Класс 8</option>
-                            <option value='9'>Класс 9</option>
-                        </select> : <select 
-                            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => changeLevel(event.target.value as level)}
-                            value={level.current}
-                            disabled={true}
-                            >
-                            <option value='all'>Все</option>
-                        </select>}
+                        <label htmlFor='learning-include'>Показать изучаемые сочетания</label>
                     </div>
                     <div className={style['checkbox-container']}>
                         <input 
                             type='checkbox' 
-                            id='learning-include'
-                            onChange={event => changeIncludeLearnt(event.target.checked)}
-                            checked={includeLearnt.current}
+                            id='only-learnt-include'
+                            onChange={event => changeShowOnlyLearntKanji(event.target.checked)}
+                            checked={onlyLearntKanji.current}
                             disabled={!session}
                         ></input>
-                        <label htmlFor='learning-include'>Показать изучаемые</label>
+                        <label htmlFor='only-learnt-include'>Показать только изучаемые иероглифы</label>
                     </div>
-                </div> */}
+                </div>
             </div>
             {!session ? 
                 <div className={style.alert}>

@@ -12,20 +12,25 @@ import { IDefaultBodyResponse } from '@/app/interfaces/response.interface'
 
 interface FilledCard {
     mode: 'FILLED'
+    id: string
     isCardAdded: boolean
-    writing: string
+    variants: [{
+        writing: string
+        readings: [string]
+    }]
+    meanings: [string]
     index: {
         filter?: number
-        sort?: number
+        sort: number
     }
-    setHasStateOfKanjiJustBeenChanged: (isAdded: boolean) => void
+    setHasStateOfComboJustBeenChanged: (isAdded: boolean) => void
 }
 interface PreloadCard {
     mode: 'PRELOAD'
 }
 type CardProps = FilledCard | PreloadCard
 
-const path = '/api/profile/kanji/single'
+const path = '/api/profile/kanji/combo'
 
 export function Card(props: CardProps) {
     const mode = props.mode
@@ -36,23 +41,26 @@ export function Card(props: CardProps) {
 
     const alerts = useContext(AlertsContext)
 
-    const writing = mode === 'PRELOAD' ? '?' : props.writing
+    const primeWriting = mode === 'PRELOAD' ? '?' : props.variants[0].writing
+    const readingsOfPrime = mode === 'PRELOAD' ? '' : props.variants[0].readings
+    const meanings = mode === 'PRELOAD' ? '' : props.meanings
     const sort = mode === 'PRELOAD' ? 'загрузка...' : props.index.sort
     const filter = mode === 'FILLED' ? props.index.filter : undefined
+    const variants = mode === 'FILLED' ? props.variants.slice(1) : []
 
-    async function addKanji() {
+    async function addCombo() {
         if (mode === 'PRELOAD') return
 
         try {
             const body = await request({
                 path,
-                body: {writing: props.writing},
+                body: {id: props.id},
                 method: 'POST'
             })
 
             if (body instanceof Error) throw body
             
-            props.setHasStateOfKanjiJustBeenChanged(true)
+            props.setHasStateOfComboJustBeenChanged(true)
 
             setIsCardAdded(true)
             
@@ -66,19 +74,19 @@ export function Card(props: CardProps) {
             console.log(error)
 
             alerts.pushAlert({
-                message: 'Сохранить иероглиф не удалось. Попробуйте позже',
+                message: 'Сохранить сочетание не удалось. Попробуйте позже',
                 status: 'error'
             })
         }
     }
-    async function removeKanji() {
+    async function removeCombo() {
         if (mode === 'PRELOAD') return
 
         try {
             const resBody = await request({
                 path,
                 method: 'DELETE',
-                body: [writing]
+                body: [props.id]
             }) as IDefaultBodyResponse
 
             if (resBody.message && resBody.applicableFor === 'alert') {
@@ -88,7 +96,7 @@ export function Card(props: CardProps) {
                 })
             }
 
-            props.setHasStateOfKanjiJustBeenChanged(false)
+            props.setHasStateOfComboJustBeenChanged(false)
 
             setIsCardAdded(false)
 
@@ -104,18 +112,41 @@ export function Card(props: CardProps) {
 
     return (
         <div className={style['card-container']}>
-            <div 
-                className={`${style.card} ${mode === 'PRELOAD' ? 'blank' : ''}`}
-            >
+            <div className={style.card}>
                 <span className={style.sort}>{sort ? sort : '?'}</span>
-                {filter ? <span className={style.filter}>{filter}</span> : null}
-                <span className={`${style.kanji} ${ibm_plex_sans_jp.className}`}>{writing}</span>
-                <div className={`${style['btn-box']} ${session && mode === 'FILLED' ? '' : style.inactive}`}>
-                    <button 
-                        onClick={() => isCardAdded ? removeKanji() : addKanji()}
-                        >{isCardAdded ? <Minus/> : <Plus/>}
-                    </button>
+                <p className={`${style.writing} ${ibm_plex_sans_jp.className}`}>{primeWriting}</p>
+                <div className={`${style.readings} ${ibm_plex_sans_jp.className}`}>
+                    {
+                        readingsOfPrime ? readingsOfPrime.map(reading => <p key={reading}>{reading}</p>) : null
+                    }
                 </div>
+                <div className={style.meanings}>
+                    {
+                        meanings ? meanings.map((meaning) => <p key={meaning}>{meaning}</p>) : null
+                    }
+                </div>
+                {
+                    variants[0] ? 
+                        <div className={`${style.variants} ${ibm_plex_sans_jp.className}`}>
+                            {variants.map(variant => {
+                                return (
+                                    <div key={variant.writing}>
+                                        <p className={style.writing}>{variant.writing}</p>
+                                        <div className={style.readings}>
+                                            {variant.readings.map(reading => <p key={reading}>{reading}</p>)}
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div> :
+                        null
+                }
+            </div>
+            <div className={`${style['btn-box']} ${session && mode === 'FILLED' ? '' : style.inactive}`}>
+                <button 
+                    onClick={() => isCardAdded ? removeCombo() : addCombo()}
+                    >{isCardAdded ? <Minus/> : <Plus/>}
+                </button>
             </div>
         </div>
     )
