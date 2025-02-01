@@ -8,4 +8,6 @@ Disallow: /repeat
 Disallow: /signin
 Disallow: /signup
 
+Disallow: /api/
+
 Sitemap: https://furoku.ru/sitemap.xml
