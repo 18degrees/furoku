@@ -7,3 +7,5 @@ Disallow: /test/combo
 Disallow: /repeat
 Disallow: /signin
 Disallow: /signup
+
+Sitemap: https://furoku.ru/sitemap.xml
