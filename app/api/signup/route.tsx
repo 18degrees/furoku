@@ -126,7 +126,7 @@ async function sendWelcomeEmail(recipient: string) {
 
     try {
         const mailTransport = nodemailer.createTransport({
-            host: 'smtppro.zoho.eu',
+            host: 'smtp.zoho.eu',
             port: 465,
             secure: true,
             auth: {
