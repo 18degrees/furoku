@@ -170,34 +170,34 @@ function getWelcomeEmail() {
                     <style>
                         @media (prefers-color-scheme: light) {
                             div {
-                                background-color: #EDDCEC;
+                                background-color: #fffaff;
                             }
                             p {
-                                color: #50444D;
+                                color: #625961;
                             }
                         }
                         @media (prefers-color-scheme: dark) {
                             div {
-                                background-color: #5D4C5C;
+                                background-color: #564555;
                             }
                             p {
-                                color: #DFD7DD
+                                color: #ede5eb
                             }
                         }
                     </style>
                 </head>
                 <body>
-                    <div style="max-width: 600px;width: fit-content;padding: 20px 30px 20px 30px;margin: 0 auto 0 auto;background-color: #EDDCEC;">
+                    <div style="max-width: 600px;width: fit-content; padding: 20px 30px 20px 30px;background-color: #fffaff;border: 1px solid #ece5ed;">
                         <table style="width: 100%;">
                             <tr>
-                                <td align="center">
-                                    <img src="https://i.postimg.cc/XYwkgYpN/furoku.png" alt="furoku logo" border="0">
+                                <td>
+                                    <img src="http://postimg.su/image/Ik9UvBVY/furoku.png" alt="furoku logo" border="0">
                                 </td>
                             </tr>
                         </table>
-                        <p style="font-family: &quot;Alegreya Sans&quot;, sans-serif;font-size: 17px;color: #50444D;">Регистрация прошла успешно. Теперь вы можете сохранять иероглифы и проходить тестирование.</p>
-                        <p style="font-family: &quot;Alegreya Sans&quot;, sans-serif;font-size: 17px;color: #50444D;">Если появятся какие-то вопросы по использованию сайта, или вы хотели бы что-то предложить для его улучшения — пишите по этому же адресу: support@furoku.ru</p>
-                        <p style="font-family: &quot;Alegreya Sans&quot;, sans-serif;font-size: 17px;color: #50444D;">С уважением,<br>furoku support</p>
+                        <p style="font-family: &quot;Alegreya Sans&quot;, sans-serif;font-size: 16px;color: #625961;line-height: 22px">Регистрация прошла успешно. Теперь вы можете сохранять иероглифы и проходить тестирование.</p>
+                        <p style="font-family: &quot;Alegreya Sans&quot;, sans-serif;font-size: 16px;color: #625961;line-height: 22px">С любыми вопросами и идеями по улучшению сайте пишите по этому же адресу: support@furoku.ru</p>
+                        <p style="font-family: &quot;Alegreya Sans&quot;, sans-serif;font-size: 16px;color: #625961;line-height: 22px; margin-top: 30px;">С уважением,<br>furoku support</p>
                     </div>
                 </body>
             </html>
