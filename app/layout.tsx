@@ -1,3 +1,4 @@
+import { ClientStyleWrapper } from './components/Client-style-wrapper'
 import { Header } from './components/header/Header'
 import { Footer } from './components/footer/Footer'
 import { Providers } from './components/Providers'
@@ -18,11 +19,13 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="ru">
         <body className={alegreya_sans.className}>
-            <Providers>
-                <Header/>
-                <main className={style.main}>{children}</main>
-                <Footer/>
-            </Providers>
+            <ClientStyleWrapper>
+                <Providers>
+                    <Header/>
+                    <main className={style.main}>{children}</main>
+                    <Footer/>
+                </Providers>
+            </ClientStyleWrapper>
         </body>
     </html>
   )
