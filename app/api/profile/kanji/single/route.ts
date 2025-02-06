@@ -374,3 +374,133 @@ export async function DELETE(req: NextRequest) {
         return remainingKanjis
     }
 }
+interface IPatchParams {
+    writing: string
+    knownValue: 'writing' |'meaning' | 'reading'
+}
+
+export async function PATCH(req: NextRequest) {
+    try {
+        const body = await req.json()
+
+        const params = getParams(body)
+
+        if (!params) return Response.json({
+            message: 'Данные неверны'
+        }, {status: 400})
+
+        const nanoServer = nano(DB_URI)
+        const usersDB: nano.DocumentScope<IUserDoc> = nanoServer.db.use('users')
+        
+        const user = await getUser(usersDB)
+        
+        if (!user) return Response.json({
+            message: 'Пользователь не авторизован'
+        }, {status: 403})
+        
+        const kanjis = user.kanjis
+        
+        if (!kanjis) throw new Error()
+        
+        const currentKanjiObj = getCurrentKanji(params.writing, kanjis)
+        
+        if (!currentKanjiObj) throw new Error()
+
+        const updatedKanjiObj = getUpdKanjiObj(currentKanjiObj, params)
+
+        const updKanjis = getUpdKanjis(kanjis, updatedKanjiObj)
+
+        await usersDB.insert({
+            ...user,
+            kanjis: updKanjis,
+            _rev: user._rev
+        } as IUserDoc)
+
+        return Response.json({
+            message: 'Результаты сохранены'
+        }, {status: 200})
+
+    } catch (error) {
+        console.log(error)
+
+    return Response.json({
+        message: "Ошибка сервера"
+    }, {status: 500})
+    }
+}
+
+function getParams(body: any): IPatchParams | null {
+    if (!body) return null
+
+    const writing = typeof body.writing === 'string' ? body.writing : null
+    const knownValue = typeof body.knownValue === 'string' ? body.knownValue : null
+
+    if (!writing || !knownValue) return null
+
+    if (knownValue !== 'writing' && knownValue !== 'meaning' && knownValue !== 'reading') return null
+
+    return {writing, knownValue}
+}
+
+function getCurrentKanji(currentWriting: string, allKanjis: usersKanji[]): usersKanji | null {
+    for (let kanjiObj of allKanjis) {
+        if (currentWriting === kanjiObj.writing) {
+            return kanjiObj
+        }
+    }
+    return null
+}
+function getUpdKanjiObj(kanjiObj: usersKanji, params: IPatchParams): usersKanji {
+    switch (params.knownValue) {
+        case 'writing': {
+            const prevMeaningPoints = kanjiObj.points.known_writing.meaning.points
+            const prevReadingPoints = kanjiObj.points.known_writing.reading.points
+
+            const updMeaningPoints = prevMeaningPoints < 10 ? prevMeaningPoints + 1 : prevMeaningPoints
+            const updReadingPoints = prevReadingPoints < 10 ? prevReadingPoints + 1 : prevReadingPoints
+
+            kanjiObj.points.known_writing.meaning.points = updMeaningPoints
+            kanjiObj.points.known_writing.reading.points = updReadingPoints
+            
+            kanjiObj.points.known_writing.total = updMeaningPoints + updReadingPoints
+            break
+        }
+        case 'reading': {
+            const prevWritingPoints = kanjiObj.points.known_reading.writing.points
+            const prevMeaningPoints = kanjiObj.points.known_reading.meaning.points
+
+            const updWritingPoints = prevWritingPoints < 10 ? prevWritingPoints + 1 : prevWritingPoints
+            const updMeaningPoints = prevMeaningPoints < 10 ? prevMeaningPoints + 1 : prevMeaningPoints
+
+            kanjiObj.points.known_reading.writing.points = updWritingPoints
+            kanjiObj.points.known_reading.meaning.points = updMeaningPoints
+            
+            kanjiObj.points.known_reading.total = updMeaningPoints + updWritingPoints
+            break
+        }
+        case 'meaning': {
+            const prevWritingPoints = kanjiObj.points.known_meaning.writing.points
+            const prevReadingPoints = kanjiObj.points.known_meaning.reading.points
+
+            const updWritingPoints = prevWritingPoints < 10 ? prevWritingPoints + 1 : prevWritingPoints
+            const updReadingPoints = prevReadingPoints < 10 ? prevReadingPoints + 1 : prevReadingPoints
+
+            kanjiObj.points.known_meaning.writing.points = updWritingPoints
+            kanjiObj.points.known_meaning.reading.points = updReadingPoints
+            
+            kanjiObj.points.known_meaning.total = updReadingPoints + updWritingPoints
+            break
+        }
+    }
+    kanjiObj.points.total = kanjiObj.points.known_meaning.total + kanjiObj.points.known_reading.total + kanjiObj.points.known_writing.total
+    
+    return kanjiObj
+}
+
+function getUpdKanjis(usersKanjis: usersKanji[], newKanji: usersKanji): usersKanji[] {
+    return usersKanjis.map(prevKanji => {
+        if (prevKanji.writing === newKanji.writing) return newKanji
+
+        return prevKanji
+    })
+}

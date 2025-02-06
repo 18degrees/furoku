@@ -31,6 +31,13 @@
     left: 10px
     
 }
+.card .increase {
+    position: absolute;
+    bottom: 11px;
+    right: 10px;
+    font-size: 22px;
+    color: #675d67;
+}
 .card p {
     color: #675d67;
 

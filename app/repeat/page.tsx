@@ -27,6 +27,7 @@ export default function Profile() {
     const {request} = useHttp()
     const [cards, setCards] = useState<IKanjiProps[] | null>(null)
     const [index, setIndex] = useState(0)
+    const [hasPointsChanged, setHasPointsChanged] = useState(false)
 
     const [isResponseLoading, setIsResponseLoading] = useState(true)
 
@@ -77,7 +78,7 @@ export default function Profile() {
             setIsResponseLoading(false)
             isFirstLoadingProcessing = false
         }
-    }, [knownValue, alerts, pointsOf, path, request])
+    }, [knownValue, alerts, pointsOf, path, request, hasPointsChanged])
 
     useEffect(() => {
         setIsShowTypenMenuOpened(false)
@@ -87,7 +88,7 @@ export default function Profile() {
     
     useEffect(() => {
         getCards()
-    }, [knownValue, pointsOf, getCards])
+    }, [knownValue, pointsOf, hasPointsChanged, getCards])
 
     useEffect(() => {
         setIsKnownMenuOpened(false)
@@ -119,6 +120,23 @@ export default function Profile() {
             }
 
             deleteCardState(id) 
+        } catch (error) {
+            alerts.pushAlert({
+                message: 'Произошла ошибка. Попробуйте позже',
+                status: 'error'
+            })
+        }
+    }
+
+    async function increaseCardPoints(id: string) {
+        try {
+            await request({
+                path,
+                method: 'PATCH',
+                body: {writing: id, knownValue}
+            }) as IDefaultBodyResponse
+    
+            setHasPointsChanged(prev => !prev)
         } catch (error) {
             alerts.pushAlert({
                 message: 'Произошла ошибка. Попробуйте позже',
@@ -269,6 +287,7 @@ export default function Profile() {
                                 knownValue={knownValue}
                                 key={cardObj.id}
                                 removeCard={removeCard}
+                                increaseCardPoints={increaseCardPoints}
                             />)
                         }) : !isResponseLoading ? 
                         <p className={style['non-kanji-plug']}>

@@ -1,5 +1,5 @@
 import { IKanjiProps, knownValue } from "@/app/interfaces/kanji.interface"
-import { alegreya, shippori_mincho, ibm_plex_sans_jp } from '@/app/fonts'
+import { alegreya, shippori_mincho, ibm_plex_sans_jp, alegreya_sans } from '@/app/fonts'
 import { SortTriangle } from "../Sort-triangle-icon"
 import { RemoveIcon } from '../Remove-icon'
 import style from './card.module.css'
@@ -10,8 +10,9 @@ interface CardProps {
     cardInfo: IKanjiProps | IComboProps
     knownValue: knownValue
     removeCard: (id: string) => {}
+    increaseCardPoints: (id: string) => {}
 }
-export default function Card({cardInfo, knownValue, removeCard}: CardProps) {
+export default function Card({cardInfo, knownValue, removeCard, increaseCardPoints}: CardProps) {
     const [isWritingShown, setIsWritingShown] = useState(knownValue === 'writing')
     const [isReadingShown, setIsReadingShown] = useState(knownValue === 'reading')
     const [isMeaningShown, setIsMeaningShown] = useState(knownValue === 'meaning')
@@ -82,6 +83,11 @@ export default function Card({cardInfo, knownValue, removeCard}: CardProps) {
                         {cardInfo.meanings[0] ? cardInfo.meanings.map(meaning => <li key={meaning}>{meaning}</li>) : <li>?</li>}
                     </ul>
                 </div>
+                <button 
+                    className={`${style.increase} ${alegreya_sans.className}`}
+                    onClick={() => increaseCardPoints(cardInfo.id)}
+                    >+1
+                </button>
             </div>
         </div>
         // <div className={style.card}>
