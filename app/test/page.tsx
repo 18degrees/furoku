@@ -3,6 +3,12 @@ import { ibm_plex_sans_jp } from '../fonts'
 import style from './page.module.css'
 import { getServerSession } from 'next-auth'
 import { authConfig } from '../configs/auth'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+    title: 'Тестирование. Выбор категории',
+    description: "Доступные разделы: проверка знания одиночных кандзи, сочетаний иероглифов и информация о тестировании"
+}
 
 export default async function Page() {
     const session = await getServerSession(authConfig)

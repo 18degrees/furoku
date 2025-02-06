@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     template: '%s | furoku',
     default: 'Помощник в повторении кандзи'
   },
-  description: "Сортировка изучаемых иероглифов в порядке срочности повторения"
+  description: "Сортировка изучаемых иероглифов по срочности повторения"
 }
 
 export default function RootLayout({children}: {children: React.ReactNode}) {

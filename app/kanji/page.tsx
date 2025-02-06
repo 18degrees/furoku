@@ -1,6 +1,12 @@
 import Link from 'next/link'
 import { ibm_plex_sans_jp } from '../fonts'
 import style from './page.module.css'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+    title: 'Списки. Выбор категории',
+    description: "Доступные разделы: одиночные кандзи, сочетания иероглифов и информация о списках"
+}
 
 export default function Page() {
     return (
