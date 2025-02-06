@@ -5,7 +5,7 @@ import { IDefaultBodyResponse } from "../interfaces/response.interface"
 
 export interface IRequest {
     path: string
-    method?: 'GET' | 'POST' | 'DELETE' | 'PUT'
+    method?: 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH'
     headers?: any
     body?: any
 }
