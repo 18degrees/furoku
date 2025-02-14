@@ -157,6 +157,26 @@ export default function Profile() {
         setCards(updCards)
     }
 
+
+    function menuToggler(menuType: menu) {
+        switch (menuType) {
+            case 'showType':
+                setIsShowTypenMenuOpened(prev => !prev)
+                setIsKnownMenuOpened(false)
+                setIsPointsnMenuOpened(false)
+                break
+            case 'knownValue':
+                setIsKnownMenuOpened(prev => !prev)
+                setIsShowTypenMenuOpened(false)
+                setIsPointsnMenuOpened(false)
+                break
+            case 'pointsOf':
+                setIsPointsnMenuOpened(prev => !prev)
+                setIsKnownMenuOpened(false)
+                setIsShowTypenMenuOpened(false)
+        }
+    }
+    
     return (
         <div className={style.container}>
             <div>
@@ -166,7 +186,7 @@ export default function Profile() {
                         <label>Тип карточек</label>
                         <div 
                             className={style.field}
-                            onClick={() => setIsShowTypenMenuOpened(prev => !prev)}
+                            onClick={() => menuToggler('showType')}
                             >
                             {
                                 showType === 'single' ? 'одиночные' : 'сочетания'
@@ -190,7 +210,7 @@ export default function Profile() {
                         <label>С известным</label>
                         <div 
                             className={style.field}
-                            onClick={() => setIsKnownMenuOpened(prev => !prev)}
+                            onClick={() => menuToggler('knownValue')}
                             >
                             {
                                 knownValue === 'meaning' ? 'значением' : 
@@ -221,7 +241,7 @@ export default function Profile() {
                         <label>По очкам</label>
                         <div 
                             className={style.field}
-                            onClick={() => setIsPointsnMenuOpened(prev => !prev)}
+                            onClick={() => menuToggler('pointsOf')}
                             >
                             {
                                 pointsOf === 'meaning' ? 'значений' : 
