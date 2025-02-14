@@ -1,4 +1,108 @@
-.show-btns {
+.card-container {
+    width: 33vw;
+    flex-shrink: 0;
+}
+.card {
+    width: 300px;
+    min-height: 400px;
+    padding: 30px 60px;
+    background-color: #FFF8FF;
+    border: 1px solid #F1E6F1;
+    margin: auto;
+    position: relative;
+}
+.card > div {
+    width: 100%;
+    margin: auto;
+}
+.card > div > div {
+    padding: 15px 0;
+}
+.card h2 {
+    display: flex;
+    justify-content: space-between;
+}
+.card h2, .card p {
+    font-size: 20px;
+}
+.card h2:last-of-type {
+    margin-top: 10px;
+}
+.card ul {
+    padding: 0;
+    list-style: none;
+    width: fit-content;
+    font-size: 20px;
+}
+.card > div > div:nth-child(1) ul {
+    margin: auto;
+
+}
+.card ul li,
+.card .writing p {
+    color: #8A7C8B;
+    user-select: text;
+}
+.card .reading p {
+    word-spacing: 9999999px;
+}
+.card .writing p {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 100px;
+}
+.card.combo .writing p {
+    line-height: 65px;
+    font-size: 59px;
+}
+.card div h2 + ul,
+.card div h2 + div {
+    height: 0;
+    overflow: hidden;
+}
+.card div.active h2 + ul,
+.card div.active h2 + div {
+    height: fit-content;
+}
+.card div.active h2 span {
+    transform: rotate(180deg) translateY(-5px);
+}
+.card div.reading {
+    word-spacing: 5px;
+}
+
+.card .remove {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    display: none;
+    
+}
+.card .increase {
+    position: absolute;
+    bottom: 11px;
+    right: 10px;
+    font-size: 22px;
+    color: #8d538d;
+    display: none;
+}
+.card:hover .remove,
+.card:hover .increase {
+    display: block;
+}
+
+@media screen and (max-width: 1120px) {
+    .card-container {
+        width: 50vw;
+    }
+}
+@media screen and (max-width: 730px) {
+    .card-container {
+        width: 100vw;
+    }
+}
+/* .show-btns {
     display: flex;
     justify-content: flex-end;
     column-gap: 10px;
@@ -75,7 +179,7 @@
     .card > div {
         width: 80%;
     }
-}
+} */
 /* .card {
     background-color: #fff8ff;
     border: 1px solid #f1e6f1;
