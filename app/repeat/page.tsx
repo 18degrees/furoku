@@ -163,7 +163,7 @@ export default function Profile() {
                 {isResponseLoading ? <div className={style.spinner}><Spinner size={30}/></div> : null}
                 <div className={style['sort-container']}>
                     <div className={isShowTypenMenuOpened ? style.active : ''}>
-                        <label>Показать иероглифы</label>
+                        <label>Тип карточек</label>
                         <div 
                             className={style.field}
                             onClick={() => setIsShowTypenMenuOpened(prev => !prev)}
@@ -218,7 +218,7 @@ export default function Profile() {
                         </ul>
                     </div>
                     <div className={isPointsMenuOpened ? style.active : ''}>
-                        <label>Отобразить по очкам</label>
+                        <label>По очкам</label>
                         <div 
                             className={style.field}
                             onClick={() => setIsPointsnMenuOpened(prev => !prev)}

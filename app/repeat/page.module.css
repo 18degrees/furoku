@@ -11,14 +11,17 @@
 }
 
 .sort-container {
-    margin-bottom: 60px;
+    width: 80%;
+    margin: 0 auto 60px 10%;
+    padding: 40px 0;
+    max-width: 800px;
     display: flex;
     width: fit-content;
     column-gap: 30px;
 }
 .sort-container,
 .sort-container li {
-    font-size: 17px;
+    font-size: 16px;
 
 }
 .sort-container > div {
