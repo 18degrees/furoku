@@ -1,6 +1,6 @@
 .header {
     height: 60px;
-    background-color: #7B6178;
+    background-color: #F3ECF3;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -13,25 +13,28 @@
 .header a {
     text-decoration: none;
 }
+.logo {
+    line-height: 35px;
+    font-size: 30px;
+    margin-left: 7%;
+    border: 1px solid rgb(187 185 188);
+}
+.user {
+    border-radius: 50%;
+}
 .user,
 .logo {
     display: block;
     width: 40px;
     height: 40px;
-    border-radius: 50%;
     text-align: center;
     background-color: rgb(255 250 255);
     color: rgb(108, 89, 110);
 }
-.logo {
-    line-height: 35px;
-    font-size: 30px;
-    margin-left: 7%;
-}
 .nav-background {
     z-index: 1;
     opacity: .3;
-    background-color: #393939;
+    background-color: #625a5a;
     display: none;
 }
 .nav {
@@ -53,10 +56,10 @@
 .nav li:first-of-type, 
 .nav li:nth-child(2),
 .nav li:nth-child(3) {
-    margin-right: 50px;    
+    margin-right: 60px;    
 }
 .nav a {
-    color: #ffffff;
+    color: #484646;
 }
 .user-box {
     margin-right: 7%;
@@ -82,12 +85,12 @@
 }
 .menu {
     padding: 15px;
-    background-color: #7B6178;
+    background-color: #F3ECF3;
     position: relative;
     text-align: start;
     line-height: normal;
     z-index: 100;
-    color: #ffffff;
+    color: #484646;
     border-radius: 5px;
 }
 .menu span {
@@ -129,7 +132,6 @@
     }
     .nav {
         display: block;
-        background-color: #7B6178;
         transform: translateX(-100%);
         position: fixed;
         left: 0;

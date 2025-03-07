@@ -1,5 +1,5 @@
 .footer {
-    background-color: #7B6178;
+    background-color: #F3ECF3;
     padding: 50px 0 50px 0;
 }
 .footer > div {
@@ -12,10 +12,10 @@
 }
 .footer h2 {
     margin-bottom: 10px;
-    color: #ffffff;
+    color: #625a5a;
 }
 .info p {
-    color: #ffffff;
+    color: #625a5a;
     user-select: all;
     font-size: 20px;
 }
