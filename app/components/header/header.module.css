@@ -14,10 +14,7 @@
     text-decoration: none;
 }
 .logo {
-    line-height: 35px;
-    font-size: 30px;
     margin-left: 7%;
-    border: 1px solid rgb(187 185 188);
 }
 .user {
     border-radius: 50%;

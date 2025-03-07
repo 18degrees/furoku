@@ -1,25 +1,14 @@
-import style from './page.module.css'
 import { alegreya, shippori_mincho } from './fonts'
-import Link from 'next/link'
-import { getServerSession } from 'next-auth'
-import Image from 'next/image'
+import { Logo } from './components/Logo'
+import style from './page.module.css'
 
 export default async function Page() {
-    const session = await getServerSession()
-
     return (
         <div className={style.container}>
             <div>
                 <div className={style['first-view']}>
                     <div className={alegreya.className}>
-                        <Image
-                            src='/big-rectangle-logo.png'
-                            alt='Furoku логотип'
-                            width={270}
-                            height={270}
-                            priority
-                            quality={100}
-                        />
+                        <Logo/>
                         <p>Furoku</p>
                         <p className={shippori_mincho.className}>付録</p>
                         <h1>Инструмент для изучения иероглифов</h1>
@@ -56,143 +45,6 @@ export default async function Page() {
                     </section>
                 </div>
             </div>
-            {/* <div>
-                <div className={style["header-block"]}>
-                    <span className={shippori_mincho.className}>付録</span>
-                    <h1 className={alegreya.className}>furoku&#160;- инструмент для&#160;изучения иероглифов</h1>
-                </div>
-                <div className={style['text-content']}>
-                    <div className={style['text-block']}>
-                        <h2 className={alegreya.className}>Идея</h2>
-                        <p> 
-                            Стандартные способы повторения кандзи эффективны, но не так точны: порядок попадающихся иероглифов напрямую не зависит от потребности в повторении: часто встречаешь те, что уже усвоены; 
-                            не учитывается 
-                        </p>
-                        <ul>
-                            <li><i>Насколько хорошо иероглиф вспоминался раньше?</i></li>
-                            <li><i>Как давно иероглиф был перед глазами?</i></li>
-                        </ul>
-                        <p>
-                            Опираясь на ответы, furoku <strong>сортирует кандзи по срочности повторения</strong>.
-                        </p>
-                    </div>
-                    <div className={style['text-block']}>
-                        <h2 className={alegreya.className}>Как использовать сайт</h2>
-                        <p>
-                            Для начала <Link href='/signup'>зарегистрируйтесь</Link>.
-                            Посмотрите в <Link href='/kanji/single'>списке</Link>, что хотите добавить к повторению. 
-                            Чтобы поддерживать актуальность сортировки по срочности, периодически проходите <Link href={session ? '/test' : '/signin?callbackUrl=/test'}>тестирование</Link>.
-                            Результаты ищите на <Link href={session ? '/repeat' : '/signin?callbackUrl=/repeat'}>странице повторения</Link>.
-                        </p>
-                    </div>
-                    <div className={style['text-block']} id='frequency'>
-                        <h2 className={alegreya.className}>Общий список</h2>
-                        <p>
-                            Для удобства подбора нужных иероглифов в <Link href='/kanji/single'>списке</Link> предусмотрены разные методы сортировки и фильтрации.
-                        </p>
-                        <h3>Фильтрация</h3>
-                        <ul>
-                            <li>Без фильтрации</li>
-                            <li>По уровням JLPT</li>
-                            <li>По классу прохождения</li>
-                        </ul>
-                        <p>Все доступные иероглифы есть в категории &quot;без фильтрации&quot;.</p>
-                        <h4>JLPT</h4>
-                        <p>Имейте в виду, что официальный список требуемых иероглифов выпускался во времена четырёхуровневой системы. Принято считать, что современный тест по сравнению с прежним подразделяется на уровни следующим образом:</p>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Раньше</th>
-                                    <th>Сейчас</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>4</td>
-                                    <td>5</td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>4</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>2-3</td>
-                                </tr>
-                                <tr>
-                                    <td>1</td>
-                                    <td>1</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <p>Для разделения прежнего второго уровня на второй и третий использованы данные из газеты &quot;маинити&quot;: встречающиеся чаще 317 иероглифов переведены в третий уровень.</p>
-                        <h3>Сортировка</h3>
-                        <ul>
-                            <li>По количеству черт</li>
-                            <li>По частоте употребления в японской википедии</li>
-                            <li>По частоте употребления в газете &quot;маинити&quot;</li>
-                        </ul>
-                        <p>
-                            Поскольку задача – сначала показать более нужное и простое, по количеству черт иероглифы показаны по восходящей последовательности. Также и для газеты: 
-                            последовательность идёт от первого номера как наиболее часто встречающегося. Для употребления в вики порядок нисходящий, так как показатель 
-                            частоты указывает на среднее число употребления иероглифа в статье.
-                        </p>
-                    </div>
-                    <div className={style['text-block']}>
-                        <h2 className={alegreya.className}>Режимы тестирования</h2>
-                        <h3>Нюансы знания</h3>
-                        <p>
-                            У кандзи можно выделить три свойства: чтения, значения и написание. 
-                            Когда взаимодействуем с иероглифом, мы встречаемся с одним из этих свойств, и задача&#160;&mdash; вспомнить два оставшихся.
-                            Притом вспомнить значения иероглифа по написанию&#160;&mdash; не то же, что вспомнить по чтению.
-                        </p>
-                        <h3>Вывод</h3>
-                        <p>
-                            Гибкое тестирование должно включать источник получения информации об иероглифе и то, 
-                            насколько хорошо удалось вспомнить два других свойства. С этой целью реализовано три режима тестирования.
-                        </p>
-                    </div>
-                    <div className={style['text-block']}>
-                        <h2 className={alegreya.className}>Повторение</h2>
-                        <h3>Очки срочности</h3>
-                        <p>
-                            Сохранённые иероглифы отличаются очками, количество которых меняется в ходе тестирования.
-                        </p>
-                        <p>
-                            На странице для повторения они расположены так: чем меньше очков, тем ближе к началу списка.
-                        </p>
-                        <p>
-                            Порядок в тестировании отличается: помимо очков, здесь значение имеет, как давно иероглиф оценивался. Формально каждое тестирование 
-                            можно проходить полностью, но когда список повторяемых достигнет десятков, сотен, скорее всего времени хватать не будет.
-                            Идея в том, чтобы не оставлять без проверки те иероглифы, с которыми раньше было всё нормально, но оценка могла устареть.
-                        </p>
-                        <h3>Доступные свойства</h3>
-                        <p>
-                            Для удобства предоставлена информация обо всех свойствах иероглифа: написании, чтении и значении с возможностью каждое из них скрыть. 
-                        </p>
-                        <p>
-                            К сожалению, значения кандзи доступны только на английском языке. Это вызвано тем, что используемые словари (см. <Link href='#sources'>источники</Link>) содержат 
-                            не столь подробный русский перевод.
-                        </p>
-                    </div>
-                    <div className={style['text-block']}>
-                        <h2 className={alegreya.className} id='sources'>Источники</h2>
-                        <p>
-                            На сайте использованы данные из файлов словарей <Link href='https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project'>JMdict/EDICT</Link> и <Link href='https://www.edrdg.org/wiki/index.php/KANJIDIC_Project'>KANJIDIC</Link>. 
-                            Эти файлы являются собственностью <Link href='https://www.edrdg.org/'>Electronic Dictionary Research and Development Group</Link> и используются в соответствии с их <Link href='https://www.edrdg.org/edrdg/licence.html'>лицензией</Link>.
-                        </p>
-                        <p>
-                            Помимо этого добавлена частота употребления кандзи в <Link href='https://ja.wikipedia.org'>японской википедии</Link>, полученная при анализе её страниц.
-                        </p>
-                    </div>
-                    <div className={style['text-block']}>
-                        <h2 className={`${style.h2} ${alegreya.className}`}>Обратная связь</h2>
-                        <p>
-                            Если есть желание, по адресу ниже можете поделиться любым пользовательским опытом, в т. ч. идеями, жалобами, предложениями.
-                        </p>
-                    </div>
-                </div>
-            </div> */}
         </div>
     )
 }

@@ -1,12 +1,13 @@
 "use client"
 
-import { shippori_mincho, alegreya } from '@/app/fonts'
+import { shippori_mincho } from '@/app/fonts'
 import { signOut, useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { PagesIcon } from '../Pages-icon'
 import { CloseIcon } from '../Close-Icon'
 import style from './header.module.css'
+import { Logo } from '../Logo'
 import Link from 'next/link'
 import '@/app/globals.css'
 
@@ -23,7 +24,7 @@ export function Header() {
 
     return (
         <header className={`${style.header}`}>
-            <span className={`${shippori_mincho.className} ${style.logo}`}>ふ</span>
+            <span className={style.logo}><Logo size='small'/></span>
             <div>
                 <div 
                     className={style['pages-icon']}
