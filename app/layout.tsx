@@ -19,13 +19,13 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="ru">
         <body className={alegreya_sans.className}>
-            <ClientStyleWrapper>
-                <Providers>
+            <Providers>
+                <ClientStyleWrapper>
                     <Header/>
                     <main className={style.main}>{children}</main>
                     <Footer/>
-                </Providers>
-            </ClientStyleWrapper>
+                </ClientStyleWrapper>
+            </Providers>
         </body>
     </html>
   )
