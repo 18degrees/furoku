@@ -3,6 +3,7 @@ import style from './footer.module.css'
 import { alegreya } from '@/app/fonts'
 import Image from 'next/image'
 import Link from 'next/link'
+import { GithubMark } from '../Gihub-mark'
 
 export function Footer() {
     return (
@@ -18,11 +19,7 @@ export function Footer() {
                     rel='external'
                     className={style.git}
                 >
-                    <Image
-                        alt='Github profile'
-                        src={github_mark}
-                        width={70}
-                    />
+                    <GithubMark/>
                 </Link>
             </div>
         </footer>
