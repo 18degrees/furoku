@@ -52,7 +52,7 @@ label, input, select, button {
   border: none
 }
 h1, h2, h3, h4 {
-    color: #7B6178;
+    color: #70676D;
 }
 h1, h2, h3 {
     font-weight: 400;
@@ -83,7 +83,7 @@ article, section {
 }
 
 p, ul, ol, summary, table {
-    color: #644E63;
+    color: #5b535b;
     font-size: 19px;
     margin-bottom: 10px;
 }
