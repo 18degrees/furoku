@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function Page() {
     return (
         <div className={style.container}>
-            <Link href='/kanji/single'>
+            <Link href='/kanji/single' className='link-box'>
                 <label>К списку<br/> иероглифов</label>
                 <div className={`${style.preview} ${style.single} ${ibm_plex_sans_jp.className}`}>
                     <p>人 自</p>
@@ -19,14 +19,14 @@ export default function Page() {
                     <p>録 仕</p>
                 </div>
             </Link>
-            <Link href='/kanji/combo'>
+            <Link href='/kanji/combo' className='link-box'>
                 <label>К списку<br/> сочетаний<br/> иероглифов</label>
                 <div className={`${style.preview} ${style.combo} ${ibm_plex_sans_jp.className}`}>
                     <p>従業員</p>
                     <p>事業</p>
                 </div>
             </Link>
-            <Link href='/kanji/info'>
+            <Link href='/kanji/info' className='link-box'>
                 <label>О списках</label>
                 <div className={`${style.preview} ${style.info}`}>
                     <p>Содержимое карточек</p>

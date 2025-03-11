@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef } from 'react'
 import { Provider } from 'react-redux'
-import { makeStore, AppStore } from '../../../lib/store'
+import { makeStore, AppStore } from '@/lib/store'
 import { setInitialTheme } from '@/lib/features/theme/themeSlice'
 import { theme } from '@/app/interfaces/theme.interface'
 

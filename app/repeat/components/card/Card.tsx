@@ -25,7 +25,7 @@ export default function Card({cardInfo, knownValue, removeCard, increaseCardPoin
     
     return (
         <div className={style['card-container']}>
-            <div className={`${style.card} ${cardInfo.writing.length === 1 ? style.single : style.combo}`}>
+            <div className={`${style.card} card ${cardInfo.writing.length === 1 ? style.single : style.combo}`}>
                 <button 
                     className={style.remove}
                     onClick={() => removeCard(cardInfo.id)}
@@ -87,7 +87,7 @@ export default function Card({cardInfo, knownValue, removeCard, increaseCardPoin
                     }
                 </div>
                 <button 
-                    className={`${style.increase} ${alegreya_sans.className}`}
+                    className={`${style.increase} increase ${alegreya_sans.className}`}
                     onClick={() => increaseCardPoints(cardInfo.id)}
                     >+1
                 </button>

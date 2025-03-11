@@ -13,25 +13,41 @@
 .header a {
     text-decoration: none;
 }
+.right-side {
+    display: flex;
+    column-gap: 30px;
+    margin-right: 30px
+}
 .logo {
-    margin-left: 7%;
+    flex-grow: 0;
+    margin-right: 50px;
+    height: 30px;
+    width: 30px;
+    margin-left: 30px;
+}
+.logo + div {
+    flex-grow: 1;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 .user {
     border-radius: 50%;
-}
-.user,
-.logo {
-    display: block;
-    width: 40px;
-    height: 40px;
+    background-color: #757575;
     text-align: center;
-    background-color: rgb(255 250 255);
-    color: rgb(108, 89, 110);
+    color: #FFFFFF;
+    width: 30px;
+    height: 30px;
+    display: block;
+    line-height: 28px;
+    font-size: 17px;
 }
+
 .nav-background {
     z-index: 1;
     opacity: .3;
-    background-color: #625a5a;
+    background-color: #878787;
     display: none;
 }
 .nav {
@@ -40,26 +56,25 @@
 }
 .nav .close {
     display: none;
-    margin: 15px 0 0 7%;
+    margin: 20px 0 11px 33px;
     cursor: pointer;
+    width: fit-content;
 }
 .nav ul {
     list-style-type: none;
     padding: 0;
+    display: flex;
+    column-gap: 45px;
 }
 .nav li {
     display: inline;
-}
-.nav li:first-of-type, 
-.nav li:nth-child(2),
-.nav li:nth-child(3) {
-    margin-right: 60px;    
+    margin-bottom: 0;
 }
 .nav a {
     color: #484646;
 }
+
 .user-box {
-    margin-right: 7%;
     height: 60px;
     text-align: center;
     line-height: 60px;
@@ -69,10 +84,6 @@
 }
 .user-box:hover .menu-container {
     display: block;
-}
-.user {
-    line-height: 40px;
-    font-size: 25px;
 }
 .menu-container {
     display: none;
@@ -96,20 +107,19 @@
 
 .pages-icon {
     display: none;
-    position: absolute;
-    left: 0;
-    top: 0;
-    margin-left: 7%;
-    height: 60px;
-    align-items: center;
     cursor: pointer;
+    height: 25px;
+    margin-left: 30px;
 }
 
 @media screen and (max-width: 900px) {
     .logo {
+        position: absolute;
+        right: 0;
+        left: 0;
         margin: auto;
     }
-    .user-box {
+    .right-side {
         position: absolute;
         right: 0;
     }
@@ -117,7 +127,7 @@
         right: -15px
     }
     .pages-icon {
-        display: flex;
+        display: block;
     }
     .nav-background {
         position: fixed;
@@ -134,7 +144,9 @@
         left: 0;
         top: 0;
         right: 0;
+        width: 210px;
         padding-bottom: 20px;
+        background-color: #F3ECF3;
     }
     .nav .close {
         display: block;

@@ -105,10 +105,15 @@ export function Card(props: CardProps) {
     return (
         <div className={style['card-container']}>
             <div 
-                className={`${style.card} ${mode === 'PRELOAD' ? 'blank' : ''}`}
+                className={`${style.card} ${mode === 'PRELOAD' ? 'blank' : ''} card`}
             >
                 <span className={style.sort}>{sort ? sort : '?'}</span>
-                {filter ? <span className={style.filter}>{filter}</span> : null}
+                <span 
+                    className={style.filter}
+                    style={{
+                        display: filter ? 'unset' : 'none'
+                    }}
+                    >{filter}</span>
                 <span className={`${style.kanji} ${ibm_plex_sans_jp.className}`}>{writing}</span>
                 <div className={`${style['btn-box']} ${session && mode === 'FILLED' ? '' : style.inactive}`}>
                     <button 

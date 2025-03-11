@@ -16,6 +16,7 @@ export default async function Page() {
         <div className={style.container}>
             <Link 
                 href={session ? '/test/single' : '/signin?callbackUrl=/test/single'}
+                className='link-box'
                 >
                 <label>К тестированию<br/> иероглифов</label>
                 <div className={`${style.preview} ${style.single} ${ibm_plex_sans_jp.className}`}>
@@ -26,6 +27,7 @@ export default async function Page() {
             </Link>
             <Link 
                 href={session ? '/test/combo' : '/signin?callbackUrl=/test/combo'}
+                className='link-box'
                 >
                 <label>К тестированию<br/> сочетаний<br/> иероглифов</label>
                 <div className={`${style.preview} ${style.combo} ${ibm_plex_sans_jp.className}`}>
@@ -33,7 +35,10 @@ export default async function Page() {
                     <p>事業</p>
                 </div>
             </Link>
-            <Link href='/test/info'>
+            <Link 
+                href='/test/info'
+                className='link-box'
+                >
                 <label>О тестировании</label>
                 <div className={`${style.preview} ${style.info}`}>
                     <p>Режимы тестирования</p>

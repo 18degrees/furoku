@@ -112,7 +112,7 @@ export function Card(props: CardProps) {
 
     return (
         <div className={style['card-container']}>
-            <div className={style.card}>
+            <div className={`${style.card} card`}>
                 <span className={style.sort}>{sort ? sort : '?'}</span>
                 <p className={`${style.writing} ${ibm_plex_sans_jp.className}`}>{primeWriting}</p>
                 <div className={`${style.readings} ${ibm_plex_sans_jp.className}`}>
@@ -142,12 +142,11 @@ export function Card(props: CardProps) {
                         null
                 }
             </div>
-            <div className={`${style['btn-box']} ${session && mode === 'FILLED' ? '' : style.inactive}`}>
-                <button 
-                    onClick={() => isCardAdded ? removeCombo() : addCombo()}
-                    >{isCardAdded ? <Minus/> : <Plus/>}
-                </button>
-            </div>
+            <button 
+                className={session && mode === 'FILLED' ? '' : style.inactive}
+                onClick={() => isCardAdded ? removeCombo() : addCombo()}
+                >{isCardAdded ? <Minus/> : <Plus/>}
+            </button>
         </div>
     )
 }

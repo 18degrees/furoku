@@ -21,6 +21,8 @@ export const themeSlice = createSlice({
             state.value = newTheme
 
             localStorage.setItem('theme', newTheme)
+
+            document.documentElement.classList.toggle('dark')
         }
     }
 })

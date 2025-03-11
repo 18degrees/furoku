@@ -1,7 +1,6 @@
 .spinner {
     border: 5px solid transparent;
     border-radius: 50%;
-    border-bottom-color: rgb(216, 168, 168);
     animation: load 1s linear infinite;
 }
 @keyframes load {

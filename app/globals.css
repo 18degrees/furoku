@@ -3,7 +3,7 @@
   box-sizing: border-box;
 }
 ::selection {
-  background-color: rgb(229 225 230);
+    background-color: rgb(229 225 230);
 }
 select::-ms-expand {
   display: none;
@@ -54,6 +54,7 @@ label, input, select, button {
 h1, h2, h3, h4 {
     color: #70676D;
 }
+
 h1, h2, h3 {
     font-weight: 400;
 }
@@ -96,4 +97,167 @@ ol > li {
     h1 {
         font-size: 32px;
     }
+}
+
+/* dark theme */
+
+html.dark ::selection {
+    background-color: rgb(86 79 89);
+}
+
+html.dark input::selection {
+    background-color: rgb(198 198 198);
+}
+
+html.dark {
+    background-color: #332F33;
+}
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4 {
+    color: #e2e2e2
+}
+html.dark p,
+html.dark ul,
+html.dark ol,
+html.dark table,
+html.dark summary,
+html.dark label {
+    color: #dadada
+}
+
+html.dark table td,
+html.dark table th {
+    border-color: #dadada;
+}
+
+/* kanji page */
+
+html.dark a label {
+    color: #dadada
+}
+html.dark .session-alert p {
+    background-color: #494949;
+}
+html.dark .settings,
+html.dark .link-box {
+    background-color: #302c2c;
+    border: 1px solid #252425;
+    color: #dadada
+}
+html.dark .card,
+html.dark .card + button {
+    background-color: #302c2c;
+    border: 1px solid #252425;
+}
+html.dark .card span {
+    color: #dadada;
+}
+html.dark .card span:nth-child(2) {
+    color: #808080
+}
+html.dark .page-choice-box button {
+    background-color: #302c2c;
+    border: 1px solid #252425;
+    color: #dadada
+}
+
+/* header, footer */
+
+html.dark header,
+html.dark header .menu,
+html.dark footer {
+    background-color: #363236;
+}
+html.dark header .menu,
+html.dark header a {
+    color: #DFDFDF
+}
+
+@media screen and (max-width: 900px) {
+    html.dark header .nav {
+        background-color: #3d3a3d;
+    }
+}
+
+/* repeat page */
+
+html.dark .card p,
+html.dark .card ul li,
+html.dark .card .increase {
+    color: #dadada;
+}
+html.dark .field,
+html.dark .field + ul {
+    background-color: #302c2c;
+    border: 1px solid #252425;
+    color: #dadada
+}
+html.dark .field + ul li.active {
+    background-color: #3d3d3d
+}
+
+html.dark .repeat-direction button {
+    color: #dadada;
+    border: 1px solid #252425;
+}
+html.dark .repeat-direction button:disabled {
+    color: #b0b0b0
+}
+
+/* test page */
+
+html.dark .checking i{
+    color: white
+}
+
+html.dark .non-kanji-container {
+    color: #dadada
+}
+
+html.dark .test-container,
+html.dark .form-container {
+    background-color: #302c2c;
+    border: 1px solid #252425;
+    color: #dadada;
+    box-shadow: none;
+}
+html.dark .test-container span,
+html.dark .test-container > div {
+    color: #dadada;
+    background-color: #302c2c;
+}
+html.dark .test-container button {
+    background-color: #302c2c;
+    border: 1px solid #252425;
+    color: #dadada;
+    box-shadow: none;
+}
+
+/* auth pages */
+
+html.dark .auth-box {
+    background-color: #302c2c;
+    border: 1px solid #252425;
+    color: #dadada;
+    box-shadow: none;
+}
+html.dark .auth-box a {
+    color: rgb(186 186 186);
+}
+html.dark .auth-box button {
+    background-color: #666666;
+    border: 1px solid #252425;
+}
+html.dark .auth-box button:disabled {
+    background-color: #4d4d4d;
+}
+
+html.dark .auth-box button:first-of-type {
+    color: rgb(186 186 186)
+}
+
+html.dark .auth-box input:invalid {
+    border-width: 2px;
 }

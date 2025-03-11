@@ -9,16 +9,20 @@ export const Providers = ({children}: {children: React.ReactNode}) => {
     const theme: theme = getTheme() 
 
     function getTheme() {
-        const providedTheme = localStorage?.getItem('theme') ?? null
-        
-        if (!providedTheme) {
-            const isPreferedDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        try {
+            const providedTheme = localStorage.getItem('theme') ?? null
             
-            if (isPreferedDark) return 'dark'
-        } else {
-            if (providedTheme === 'dark') return 'dark'
+            if (!providedTheme) {
+                const isPreferedDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+                
+                if (isPreferedDark) return 'dark'
+            } else {
+                if (providedTheme === 'dark') return 'dark'
+            }
+            return 'light'
+        } catch (error) {
+            return 'light'
         }
-        return 'light'
     }
 
     return (

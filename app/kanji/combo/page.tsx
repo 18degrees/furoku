@@ -395,7 +395,7 @@ export default function Page() {
                 <p>Здесь вы найдёте доступные к повторению сочетания&nbsp;иероглифов.</p>
                 <p>Подробнее о содержимом карточек и упрощении поиска смотрите на <Link href='/kanji/info'>информационной странице</Link>.</p>
             </div>
-            <div className={style.settings}>
+            <div className={`${style.settings} settings`}>
                 <div className={style.filter}>
                     <p>Фильтрация</p>
                     <div className={style.radios}>
@@ -494,7 +494,7 @@ export default function Page() {
                 </div>
             </div>
             {!session ? 
-                <div className={style.alert}>
+                <div className={`${style.alert} session-alert`}>
                     <p><Link href='/signin'>Авторизируйтесь</Link> для добавления иероглифов к повторению</p>
                 </div> : null
             }

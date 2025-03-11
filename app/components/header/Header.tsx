@@ -10,9 +10,15 @@ import style from './header.module.css'
 import { Logo } from '../Logo'
 import Link from 'next/link'
 import '@/app/globals.css'
+import { ThemeIcon } from '../Theme-icon'
+import { useAppDispatch, useAppSelector } from "@/app/hooks/redux.hook"
+import { toggleTheme } from '@/lib/features/theme/themeSlice'
 
 export function Header() {
     const {data: session} = useSession()
+
+    const dispatch = useAppDispatch()
+    const theme = useAppSelector((state) => state.theme.value)
 
     const [isNavOpened, setIsNavOpened] = useState(false)
 
@@ -24,74 +30,79 @@ export function Header() {
 
     return (
         <header className={`${style.header}`}>
-            <span className={style.logo}><Logo size='small'/></span>
+            <div className={style.logo}><Logo size='small'/></div>
             <div>
-                <div 
-                    className={style['pages-icon']}
-                    onClick={() => setIsNavOpened(true)}>
-                    <PagesIcon/>
-                </div>
                 <div>
                     <div 
-                        className={`${style['nav-background']} nav-background`}
-                        onClick={() => setIsNavOpened(false)}
-                    />
-                    <nav className={`${style.nav} nav`}>
-                        <div 
-                            className={style.close}
-                            onClick={() => setIsNavOpened(false)}>
-                            <CloseIcon/>
-                        </div>
-                        <ul>
-                            <li>
-                                <Link 
-                                    href='/'
-                                    onClick={() => setIsNavOpened(false)}
-                                    >О сайте
-                                </Link>
-                            </li>
-                            <li>
-                                <Link 
-                                    href='/kanji'
-                                    onClick={() => setIsNavOpened(false)}
-                                    >Иероглифы
-                                </Link>
-                            </li>
-                            <li>
-                                <Link 
-                                    href='/test'
-                                    onClick={() => setIsNavOpened(false)}
-                                    >Тестирование
-                                </Link>
-                            </li>
-                            <li>
-                                <Link 
-                                    href={session ? '/repeat' : '/signin?callbackUrl=/repeat'}
-                                    onClick={() => setIsNavOpened(false)}
-                                    >Повторение
-                                </Link>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-            <div className={style['user-box']}>
-                {session ? 
-                <>
-                    <span className={`${shippori_mincho.className} ${style.user}`}>人</span>
-                    <div className={style['menu-container']}>
-                        <div className={style.menu}>
-                            <span onClick={() => signOut()}>Выйти</span>
-                        </div>
+                        className={style['pages-icon']}
+                        onClick={() => setIsNavOpened(true)}>
+                        <PagesIcon/>
                     </div>
-                </>
-                :
-                <Link 
-                    href='/signin' 
-                    className={`${shippori_mincho.className} ${style.user}`}
-                >?
-                </Link>
-                }
+                    <div>
+                        <div 
+                            className={`${style['nav-background']} nav-background`}
+                            onClick={() => setIsNavOpened(false)}
+                        />
+                        <nav className={`${style.nav} nav`}>
+                            <div 
+                                className={style.close}
+                                onClick={() => setIsNavOpened(false)}>
+                                <CloseIcon/>
+                            </div>
+                            <ul>
+                                <li>
+                                    <Link 
+                                        href='/'
+                                        onClick={() => setIsNavOpened(false)}
+                                        >О сайте
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link 
+                                        href='/kanji'
+                                        onClick={() => setIsNavOpened(false)}
+                                        >Иероглифы
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link 
+                                        href='/test'
+                                        onClick={() => setIsNavOpened(false)}
+                                        >Тестирование
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link 
+                                        href={session ? '/repeat' : '/signin?callbackUrl=/repeat'}
+                                        onClick={() => setIsNavOpened(false)}
+                                        >Повторение
+                                    </Link>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <div className={style['right-side']}>
+                    <button onClick={() => dispatch(toggleTheme())}><ThemeIcon/></button>
+                    <div className={style['user-box']}>
+                        {session ? 
+                        <>
+                            <span className={`${shippori_mincho.className} ${style.user}`}>人</span>
+                            <div className={style['menu-container']}>
+                                <div className={`${style.menu} menu`}>
+                                    <span onClick={() => signOut()}>Выйти</span>
+                                </div>
+                            </div>
+                        </>
+                        :
+                        <Link 
+                            href='/signin' 
+                            className={`${shippori_mincho.className} ${style.user}`}
+                        >?
+                        </Link>
+                        }
+                    </div>
+                </div>
             </div>
             <style jsx>{`
                     ${isNavOpened ? `
@@ -108,19 +119,19 @@ export function Header() {
                         ${
                             pathname === '/' ? `
                                 .nav li:first-of-type {
-                                    background-color: #6e596d
+                                    background-color: ${theme === 'light' ? '#e4dae4' : '#312f2f'}
                                 }
                             ` : pathname === '/kanji' ? `
                                 .nav li:nth-of-type(2) {
-                                    background-color: #6e596d
+                                    background-color: ${theme === 'light' ? '#e4dae4' : '#312f2f'}
                                 }
                             ` : pathname === '/test' ? `
                                 .nav li:nth-of-type(3) {
-                                    background-color: #6e596d
+                                    background-color: ${theme === 'light' ? '#e4dae4' : '#312f2f'}
                                 }
                             ` : pathname === '/repeat' ? `
                                 .nav li:nth-of-type(4) {
-                                    background-color: #6e596d
+                                    background-color: ${theme === 'light' ? '#e4dae4' : '#312f2f'}
                                 }
                             ` : ''}
                     `   : ``}

@@ -396,7 +396,7 @@ export default function Page() {
                 <p>Подробнее о содержимом карточек и упрощении поиска смотрите на <Link href='/kanji/info'>информационной странице</Link>.</p>
             </div>
             {/* <div className={style['sort-block']}> */}
-            <div className={style.settings}>
+            <div className={`${style.settings} settings`}>
                 <div className={style.filter}>
                     <p>Фильтрация</p>
                     <div className={style.radios}>
@@ -515,122 +515,9 @@ export default function Page() {
                         <label htmlFor='learning-include'>Показать изучаемые кандзи</label>
                     </div>
                 </div>
-                {/* <div>
-                    <p>Отобразить по</p>
-                    <div className={style.radios}>
-                        <label>JLPT
-                            <input 
-                                type='radio' 
-                                name='sort' 
-                                value='jlpt' 
-                                defaultChecked={sortMethod === 'jlpt'} 
-                                onChange={() => onSortMethodChange('jlpt')}
-                                />
-                        </label>
-                        <label>Чертам
-                        <input 
-                                type='radio' 
-                                name='sort' 
-                                value='stroke' 
-                                defaultChecked={sortMethod === 'stroke'} 
-                                onChange={() => onSortMethodChange('stroke')}
-                                />
-                        </label>
-                        <label>Газете &quot;Маинити&quot;
-                        <input 
-                                type='radio' 
-                                name='sort' 
-                                value='mainichi' 
-                                defaultChecked={sortMethod === 'mainichi'} 
-                                onChange={() => onSortMethodChange('mainichi')}
-                                />
-                        </label>
-                        <label>Классу
-                        <input 
-                                type='radio' 
-                                name='sort' 
-                                value='grade' 
-                                defaultChecked={sortMethod === 'grade'} 
-                                onChange={() => onSortMethodChange('grade')}
-                                />
-                        </label>
-                        <label>Частоте в вики
-                        <input 
-                                type='radio' 
-                                name='sort' 
-                                value='wiki' 
-                                defaultChecked={sortMethod === 'wiki'} 
-                                onChange={() => onSortMethodChange('wiki')}
-                                />
-                        </label>
-                    </div>
-                    <div>
-                        <input 
-                            type='text'
-                            onChange={(event) => setSearchText(event.target.value)}
-                            value={searchText}
-                            spellCheck={false}
-                            placeholder='Поиск'
-                        />
-                        {sortMethod === 'wiki' || sortMethod === 'mainichi' ? <select 
-                            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => changeLevel(event.target.value as level)}
-                            value={level.current}
-                            disabled={!!searchText}
-                            >
-                            <option value='all'>Все</option>
-                            <option value='5'>Уровень 5</option>
-                            <option value='4'>Уровень 4</option>
-                            <option value='3'>Уровень 3</option>
-                            <option value='2'>Уровень 2</option>
-                            <option value='1'>Уровень 1</option>
-                        </select> : sortMethod === 'jlpt' ? <select 
-                            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => changeLevel(event.target.value as level)}
-                            value={level.current}
-                            disabled={!!searchText}
-                            >
-                            <option value='all'>Все</option>
-                            <option value='5'>N5</option>
-                            <option value='4'>N4</option>
-                            <option value='3'>N3</option>
-                            <option value='2'>N2</option>
-                            <option value='1'>N1</option>
-                        </select> : sortMethod === 'grade' ? <select 
-                            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => changeLevel(event.target.value as level)}
-                            value={level.current}
-                            disabled={!!searchText}
-                            >
-                            <option value='all'>Все</option>
-                            <option value='1'>Класс 1</option>
-                            <option value='2'>Класс 2</option>
-                            <option value='3'>Класс 3</option>
-                            <option value='4'>Класс 4</option>
-                            <option value='5'>Класс 5</option>
-                            <option value='6'>Класс 6</option>
-                            <option value='7'>Класс 7</option>
-                            <option value='8'>Класс 8</option>
-                            <option value='9'>Класс 9</option>
-                        </select> : <select 
-                            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => changeLevel(event.target.value as level)}
-                            value={level.current}
-                            disabled={true}
-                            >
-                            <option value='all'>Все</option>
-                        </select>}
-                    </div>
-                    <div className={style['checkbox-container']}>
-                        <input 
-                            type='checkbox' 
-                            id='learning-include'
-                            onChange={event => changeIncludeLearnt(event.target.checked)}
-                            checked={includeLearnt.current}
-                            disabled={!session}
-                        ></input>
-                        <label htmlFor='learning-include'>Показать изучаемые</label>
-                    </div>
-                </div> */}
             </div>
             {!session ? 
-                <div className={style.alert}>
+                <div className={`${style.alert} session-alert`}>
                     <p><Link href='/signin'>Авторизируйтесь</Link> для добавления иероглифов к повторению</p>
                 </div> : null
             }

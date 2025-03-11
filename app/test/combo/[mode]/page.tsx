@@ -137,7 +137,7 @@ export default function Test({params}: {params: {mode : string}}) {
     return (
         <div className={style.container}>
             {combosInfo && (params.mode === 'known_writing' || params.mode === 'known_reading' || params.mode === 'known_meaning') && !isTestFinished ? (
-                <div className={style['test-container']}>
+                <div className={`${style['test-container']} test-container`}>
                     <span className={style['page-count']}>{`${pageNumber} / ${maxPageNumber}`}</span>
                     <div className={style['writing-block']}>
                         <span className={`${style.writing} writing`}>{
@@ -177,17 +177,17 @@ export default function Test({params}: {params: {mode : string}}) {
                     </button>
                 </div>
             ) : areCombosLoading ? (
-                <div className={style['non-kanji-container']}>
+                <div className={`${style['non-kanji-container']} non-kanji-container`}>
                     <span className={style.loading}></span>
                 </div> 
             ) : !isTestFinished ? (
-                <div className={style['non-kanji-container']}>
+                <div className={`${style['non-kanji-container']} non-kanji-container`}>
                     <h2>Иероглифы отсутствуют</h2>
                     <p>В этой категории тестировать нечего.<br/>
                     Пока недоступны недавно протестированные комбинации иероглифов, вы можете <Link href='/kanji/combo' className={style.link}>добавить новые</Link>.</p>
                 </div>
             ) : (
-                <div className={style['non-kanji-container']}>
+                <div className={`${style['non-kanji-container']} non-kanji-container`}>
                     <h2>Тест завершён</h2>
                     <p>Возвращайтесь позже и не забудьте <Link href='/repeat'>повторить иероглифы</Link>.</p>
                 </div>

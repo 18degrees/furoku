@@ -19,7 +19,7 @@ export function KnownWritingForm({readingKnowledge, meaningKnowledge, setReading
         setMeaningKnowledge(knowledgeLevel)
     }
     return (
-        <div className={style.container}>
+        <div className={`${style.container} form-container`}>
             <p className={style.question}>Как вы оцениваете свой уровень&nbsp;знания</p>
             <div className={style['column-headers']}>
                 <span>чтений</span> <span>значений</span>
@@ -98,7 +98,7 @@ export function KnownReadingForm({writingKnowledge, meaningKnowledge, setWriting
         setMeaningKnowledge(knowledgeLevel)
     }
     return (
-        <div className={style.container}>
+        <div className={`${style.container} form-container`}>
             <p className={style.question}>Как вы оцениваете свой уровень&nbsp;знания</p>
             <div className={style['column-headers']}>
                 <span>написания</span> <span>значений</span>
@@ -176,7 +176,7 @@ export function KnownMeaningForm({readingKnowledge, writingKnowledge, setReading
         setWritingKnowledge(knowledgeLevel)
     }
     return (
-        <div className={style.container}>
+        <div className={`${style.container} form-container`}>
             <p className={style.question}>Как вы оцениваете свой уровень&nbsp;знания</p>
             <div className={style['column-headers']}>
                 <span>написания</span> <span>чтений</span>

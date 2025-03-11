@@ -257,7 +257,7 @@ export default function Profile() {
                     <div className={isShowTypenMenuOpened ? style.active : ''}>
                         <label>Тип карточек</label>
                         <div 
-                            className={style.field}
+                            className={`${style.field} field`}
                             onClick={() => menuToggler('showType')}
                             >
                             {
@@ -267,12 +267,12 @@ export default function Profile() {
                         </div>
                         <ul>
                             <li 
-                                className={showType === 'single' ? style.active : ''}
+                                className={showType === 'single' ? `${style.active} active` : ''}
                                 onClick={() => setShowType('single')}
                                 >одиночные
                             </li>
                             <li 
-                                className={showType === 'combo' ? style.active : ''}
+                                className={showType === 'combo' ? `${style.active} active` : ''}
                                 onClick={() => setShowType('combo')}
                                 >сочетания
                             </li>
@@ -281,7 +281,7 @@ export default function Profile() {
                     <div className={isKnownMenuOpened ? style.active : ''}>
                         <label>С известным</label>
                         <div 
-                            className={style.field}
+                            className={`${style.field} field`}
                             onClick={() => menuToggler('knownValue')}
                             >
                             {
@@ -293,17 +293,17 @@ export default function Profile() {
                         </div>
                         <ul>
                             <li 
-                                className={knownValue === 'writing' ? style.active : ''}
+                                className={knownValue === 'writing' ? `${style.active} active` : ''}
                                 onClick={() => setKnownValue('writing')}
                                 >написанием
                             </li>
                             <li 
-                                className={knownValue === 'reading' ? style.active : ''}
+                                className={knownValue === 'reading' ? `${style.active} active` : ''}
                                 onClick={() => setKnownValue('reading')}
                                 >чтением
                             </li>
                             <li 
-                                className={knownValue === 'meaning' ? style.active : ''}
+                                className={knownValue === 'meaning' ? `${style.active} active` : ''}
                                 onClick={() => setKnownValue('meaning')}
                                 >значением
                             </li>
@@ -312,7 +312,7 @@ export default function Profile() {
                     <div className={isPointsMenuOpened ? style.active : ''}>
                         <label>По очкам</label>
                         <div 
-                            className={style.field}
+                            className={`${style.field} field`}
                             onClick={() => menuToggler('pointsOf')}
                             >
                             {
@@ -325,7 +325,7 @@ export default function Profile() {
                         </div>
                         <ul>
                             <li 
-                                className={pointsOf === 'total' ? style.active : ''}
+                                className={pointsOf === 'total' ? `${style.active} active` : ''}
                                 onClick={() => setPointsOf('total')}
                                 >общим
                             </li>
@@ -333,36 +333,36 @@ export default function Profile() {
                                 knownValue === 'writing' ? 
                                 <>
                                     <li 
-                                        className={pointsOf === 'reading' ? style.active : ''}
+                                        className={pointsOf === 'reading' ? `${style.active} active` : ''}
                                         onClick={() => setPointsOf('reading')}
                                         >чтений
                                     </li>
                                     <li 
-                                        className={pointsOf === 'meaning' ? style.active : ''}
+                                        className={pointsOf === 'meaning' ? `${style.active} active` : ''}
                                         onClick={() => setPointsOf('meaning')}
                                         >значений
                                     </li>
                                 </> : knownValue === 'meaning' ? 
                                 <>
                                     <li 
-                                        className={pointsOf === 'writing' ? style.active : ''}
+                                        className={pointsOf === 'writing' ? `${style.active} active` : ''}
                                         onClick={() => setPointsOf('writing')}
                                         >написания
                                     </li>
                                     <li 
-                                        className={pointsOf === 'reading' ? style.active : ''}
+                                        className={pointsOf === 'reading' ? `${style.active} active` : ''}
                                         onClick={() => setPointsOf('reading')}
                                         >чтений
                                     </li>
                                 </> :
                                 <>
                                     <li 
-                                        className={pointsOf === 'writing' ? style.active : ''}
+                                        className={pointsOf === 'writing' ? `${style.active} active` : ''}
                                         onClick={() => setPointsOf('writing')}
                                         >написания
                                     </li>
                                     <li 
-                                        className={pointsOf === 'meaning' ? style.active : ''}
+                                        className={pointsOf === 'meaning' ? `${style.active} active` : ''}
                                         onClick={() => setPointsOf('meaning')}
                                     >значений</li>
                                 </>
@@ -374,7 +374,7 @@ export default function Profile() {
                 {
                     cards ?
                         <>
-                            <div className={style['buttons']}>
+                            <div className={`${style['buttons']} repeat-direction`}>
                                 <button 
                                     onClick={() => onIndexDecrement()}
                                     disabled={!columnsCount || !cards || index === 0}

@@ -48,16 +48,15 @@
     font-size: 20px;
 }
 
-.btn-box {
+.card-container button {
     border: 1px solid #f1e6f1;
     background-color: #fff8ff;
     margin: 3px 0 30px auto;
-    width:fit-content
-}
-.btn-box.inactive {
-    display: none;
-}
-.btn-box button {
-    width: 45px;
+    width:fit-content;
     height: 45px;
+    width: 45px;
+    display: block;
+}
+.card-container button.inactive {
+    display: none;
 }

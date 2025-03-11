@@ -28,6 +28,9 @@
     color: #6b616b;
     
 }
+html.dark .settings {
+    background-color: #303030;
+}
 .settings .filter,
 .settings .sort {
     margin-bottom: 40px;

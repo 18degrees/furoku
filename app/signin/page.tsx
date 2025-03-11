@@ -66,7 +66,7 @@ export default function SignIn() {
     }
     return (
         <div className={style.container}>
-            <div className={style.content}>
+            <div className={`${style.content} auth-box`}>
                 {isResponseLoading ? <div className={style.spinner}><Spinner size={30}/></div> : null}
                 <h1 className={`${alegreya.className} ${style.h1}`}>Вход</h1>
                 <div className={style.interactive}>

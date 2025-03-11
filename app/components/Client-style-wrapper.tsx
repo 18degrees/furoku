@@ -18,7 +18,7 @@ export function ClientStyleWrapper({
         } else {
             document.documentElement.classList.remove('dark')
         }
-    }, [])
+    }, [theme])
 
     return <>{children}</>
 }

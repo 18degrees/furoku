@@ -33,6 +33,10 @@
 .inputs-box {
     padding-top: 40px;
 }
+.inputs-box button:first-of-type {
+    background-color: transparent !important;
+    border: unset;
+}
 .credentials {
     display: flex;
     flex-direction: column;
